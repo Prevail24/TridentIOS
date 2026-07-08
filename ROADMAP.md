@@ -1,114 +1,328 @@
-# Trident Roadmap
+# 🔱 Trident IOS Roadmap
 
-**Project Codename:** Trident  
-**Parent World:** The Watchers  
-**Purpose:** A battle-tested OSINT CTF co-pilot for authorized investigations, Hack The Box challenges, training labs, and Watchers-style field reports.
-
-TridentIOS is not just a prompt pack. It is intended to become a practical investigation system: part methodology, part skill library, part OSINT notebook, part field-report engine.
+> **Observe. Remember. Reason.**
 
 ---
 
-## Core Identity
+# Vision
 
-TridentIOS exists to help an investigator move from scattered clues to defensible conclusions.
+Trident IOS is an Intelligence Operating System.
 
-The system should always support the Trident Loop:
+Its purpose is not simply to execute cybersecurity tools.
 
-1. **Collect** — gather visible clues, metadata, usernames, domains, images, dates, locations, and artifacts.
-2. **Correlate** — connect clues across sources, timelines, identities, domains, files, and platforms.
-3. **Conclude** — produce evidence-backed hypotheses, confidence levels, rejected leads, next pivots, and final reports.
+Its purpose is to transform observations into knowledge through a modular, event-driven intelligence platform.
 
-The Watchers layer adds tone, identity, and report style, but the tool must remain useful in real CTF work.
+Every feature should strengthen one or more of the following capabilities:
 
----
-
-## Phase I — Intelligence Foundation (Completed)
-
-- [x] Observation model  
-- [x] Entity resolution  
-- [x] Relationship engine  
-- [x] The Loom  
-- [x] Recursive graph traversal  
-- [x] Product/version intelligence  
-- [x] CLI querying  
+- Observe
+- Remember
+- Correlate
+- Reason
+- Communicate
 
 ---
 
-## Phase II — Differential Intelligence (Current)
+# Current Progress
 
-- [ ] Diff engine  
-- [ ] Baseline snapshots  
-- [ ] Change detection  
-- [ ] Asset history  
-- [ ] Drift reports  
-- [ ] Daily intelligence summaries  
+## 📖 Book I — Memory ✅
 
----
+Mission Foundation
 
-## Phase III — Multi-Sensor Ingestion
+# Completed
 
-- [ ] HTTPX  
-- [ ] DNS  
-- [ ] WHOIS  
-- [ ] SSL/TLS certificates  
-- [ ] Nuclei  
-- [ ] GitHub  
-- [ ] Shodan (optional)  
-- [ ] BloodHound import  
-- [ ] Cloud inventory  
+- Mission Engine
+- Observation Models
+- Observation Translator
+- Timeline Service
+- Mission Chronicle
+- Mission Reports
+- Differential Intelligence
+
+Outcome
+
+Trident learned how to remember.
 
 ---
 
-## Phase IV — Knowledge Graph Expansion
+## 📖 Book II — Observation ✅
 
-- [ ] Operating systems  
-- [ ] Technologies  
-- [ ] Certificates  
-- [ ] Domains  
-- [ ] Users  
-- [ ] Groups  
-- [ ] Trusts  
-- [ ] Vulnerabilities (CVE)  
-- [ ] Organizations  
-- [ ] Cloud assets  
+Sensor Framework
 
----
+# Completed
 
-## Phase V — Intelligence Layer
+- Abstract Sensor Interface
+- Sensor Registry
+- Nmap Sensor
+- Adapter Architecture
+- CLI Sensor Integration
+- Sensor Lifecycle
 
-- [ ] Risk scoring  
-- [ ] Interestingness detection  
-- [ ] Attack path discovery  
-- [ ] Recommendation engine  
-- [ ] Timeline generation  
-- [ ] AI investigation summaries  
+Outcome
+
+Trident learned how to observe.
 
 ---
 
-## Validation Ladder
+## 📖 Book III — Intelligence 🚧
 
-Progression through increasing complexity and realism:
+Current Development
 
-- Unit tests  
-- scanme.nmap.org  
-- Metasploitable  
-- OWASP Juice Shop  
-- Hack The Box Machines  
-- Hack The Box Fortresses  
-- Real enterprise environments  
+# Completed
+
+- Entity Engine
+- Relationship Model
+- Confidence Model
+- Correlation Rules
+- Event Bus Foundation
+
+## In Progress
+
+- Observation Pipeline
+- Entity Correlation
+- Automatic Relationship Discovery
+- Mission Context
+
+Outcome
+
+Trident learns to understand.
 
 ---
 
-## North Star
+# Kernel v0.1 ✅
 
-Success is measured not by simply running tools, but by Trident correctly understanding increasingly complex environments and providing meaningful, actionable intelligence.
+Core Platform
+
+Completed
+
+- Mission Engine
+- Sensor Framework
+- Observation Engine
+- Entity Engine
+- Event Bus
+- Correlation Engine
+- Reporting Framework
+
+The Trident Kernel now exists.
 
 ---
 
-## Development Principles
+# Kernel v0.2
 
-- Observe.  
-- Remember.  
-- Reason.  
+Current Milestone
 
-Never make the human rediscover what Trident already knows.
+Mission Context
+
+- Active Mission Manager
+- Mission Events
+- Mission Metadata
+
+Observation Pipeline
+
+- ObservationCreated Events
+- EntityCreated Events
+- RelationshipCreated Events
+
+Sensor Improvements
+
+- Sensor Auto Discovery
+- Sensor Metadata
+- Capability Registry
+
+Reporting
+
+- Entity Reports
+- Relationship Reports
+- Mission Statistics
+
+---
+
+# Kernel v0.3
+
+Knowledge Graph
+
+- Graph Storage
+- Graph Traversal
+- Relationship Explorer
+- Entity Search
+
+Reasoning
+
+- Correlation Confidence
+- Rule Chaining
+- Attack Path Discovery
+- Duplicate Detection
+
+---
+
+# Kernel v0.4
+
+Plugin SDK
+
+- External Sensors
+- External Reports
+- External Services
+- Third-party Extensions
+
+Live Events
+
+- WebSocket Streaming
+- Live Dashboard
+- Mission Monitoring
+
+---
+
+# Kernel v1.0
+
+Stable Platform
+
+Mission Engine
+
+Sensor Framework
+
+Knowledge Graph
+
+Reasoning Engine
+
+Plugin SDK
+
+Public API
+
+Documentation
+
+Testing
+
+---
+
+# Future Sensors
+
+Recon
+
+- Nmap
+- HTTPX
+- DNS
+- SSL
+- SMB
+- LDAP
+- Kerberos
+
+Web
+
+- Nuclei
+- Gobuster
+- Feroxbuster
+- ffuf
+
+Cloud
+
+- AWS
+- Azure
+- GCP
+
+Infrastructure
+
+- BloodHound
+- Certipy
+- CrackMapExec
+- NetExec
+
+Threat Intelligence
+
+- Shodan
+- Censys
+- VirusTotal
+- AbuseIPDB
+
+Source Intelligence
+
+- GitHub
+- Whois
+- Certificate Transparency
+
+---
+
+# Future Applications
+
+Built on the Trident Kernel
+
+- HTB Companion
+- OSINT Investigation
+- Threat Hunting
+- Active Directory Assessment
+- Cloud Assessment
+- Incident Response
+- Red Team Operations
+- Blue Team Investigation
+
+---
+
+# Long-Term Vision
+
+The Trident Kernel should never need redesign when new capabilities are added.
+
+Every new feature should be implemented as:
+
+Mission
+
+↓
+
+Sensor
+
+↓
+
+Observation
+
+↓
+
+Entity
+
+↓
+
+Relationship
+
+↓
+
+Knowledge
+
+↓
+
+Reasoning
+
+↓
+
+Report
+
+The architecture remains constant.
+
+Only the intelligence grows.
+
+---
+
+# Project Philosophy
+
+Observe.
+
+Collect evidence.
+
+Remember.
+
+Preserve knowledge.
+
+Correlate.
+
+Connect evidence together.
+
+Reason.
+
+Transform knowledge into intelligence.
+
+Communicate.
+
+Deliver intelligence that humans can act upon.
+
+---
+
+# Designed by Prevail
+
+*"Build platforms, not features."*
+
+🔱
