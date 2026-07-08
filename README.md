@@ -1,6 +1,6 @@
 <p align="center">
 
-  <img src="assets/tridentIOS_dashboard_v1_readme.png" width="100%" alt="Trident IOS Dashboard Concept">
+  <img src="assets/tridentIOS_dashboard_v1.png" width="100%" alt="Trident IOS Dashboard Concept">
 
 </p>
 
