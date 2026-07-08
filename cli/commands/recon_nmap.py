@@ -1,10 +1,10 @@
-from core.adapters.nmap_adapter import NmapAdapter
+from core.sensors.nmap.sensor import NmapSensor
 
 
 def recon_nmap(target: str):
-    adapter = NmapAdapter(target)
+    sensor = NmapSensor(target)
 
-    run = adapter.execute()
+    run = sensor.collect()
 
     print()
     print("═══════════════════════════════")
