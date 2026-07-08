@@ -5,7 +5,29 @@
 </p>
 
 # 🔱 Trident IOS 🔱
-## Intelligence Operating System
+
+---
+
+# Origins
+
+Trident IOS began life as an experimental fork inspired by the architecture and ideas explored in the **Claude OSINT** project.
+
+That project helped spark the initial direction and demonstrated how an intelligence-first workflow could be organized.
+
+As development progressed, Trident evolved into its own platform with a different architecture, philosophy, and long-term vision centered around the concept of an **Intelligence Operating System**.
+
+We gratefully acknowledge that early inspiration while continuing to build Trident as its own independent project.
+
+---
+
+## Designed by
+
+# **Prevail**
+
+*"Signals fade. Patterns persist."*
+
+
+## 🔱 Welcome to the Intelligence Operating System
 
 > **Observe. Remember. Reason.**
 
