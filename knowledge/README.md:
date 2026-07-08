@@ -1,0 +1,26 @@
+# 🔱 Trident Knowledge
+
+The `knowledge/` directory is the persistent intelligence layer of Trident Security OS.
+
+It stores structured information that may be referenced across missions and investigations.
+
+Examples include:
+
+- Entities
+- Observations
+- Relationships
+- Evidence Records
+- Mission Records
+
+## Purpose
+
+Unlike temporary mission artifacts, the knowledge base represents information that has long-term value and may be reused across future operations.
+
+Knowledge should be:
+
+- Accurate
+- Evidence-backed
+- Structured
+- Reviewed before committing
+
+This directory is part of Trident's intelligence architecture.
