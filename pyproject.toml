@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trident-ios"
+version = "0.2.0"
+description = "Trident IOS - Intelligence Operating System"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Prevail" }
+]
+dependencies = [
+    "rich>=13.0.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cli", "cli.*", "core", "core.*"]
+namespaces = false
+
+[project.scripts]
+trident = "cli.main:main"
