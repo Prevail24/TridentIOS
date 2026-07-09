@@ -7,6 +7,8 @@ from core.engine import TridentEngine
 from core.parsers.nmap.xml_parser import NmapXMLParser
 from core.services.observation_emitter import ObservationEmitter
 from core.services.observation_engine import ObservationEngine
+from core.services.nmap_observation_translator import NmapObservationTranslator
+
 
 class NmapAdapter(ToolAdapter):
     """
@@ -46,6 +48,18 @@ class NmapAdapter(ToolAdapter):
         # Parse Nmap XML into native observations
         parser = NmapXMLParser()
         observations = parser.parse(xml_path)
+
+        # Build knowledge graph from native observations
+        translator = NmapObservationTranslator()
+        graph = translator.build_graph(observations)
+
+        print()
+        print("═══════════════════════════════")
+        print("    KNOWLEDGE GRAPH")
+        print("═══════════════════════════════")
+        print(f"Nodes : {graph.node_count()}")
+        print(f"Edges : {graph.edge_count()}")
+        print()
 
         # Emit canonical observations
         emitter = ObservationEmitter()
