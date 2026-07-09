@@ -21,4 +21,4 @@ include = ["cli", "cli.*", "core", "core.*"]
 namespaces = false
 
 [project.scripts]
-trident = "cli.main:main"
+trident = "cli.entrypoint:main"
