@@ -2,7 +2,6 @@ import argparse
 
 from cli.commands.dashboard import show_dashboard
 from cli.commands.list import list_missions, list_observations
-from cli.commands.mission import new_mission
 from cli.commands.new import new_observation
 from cli.commands.open import open_observation
 from cli.commands.open_mission import open_mission
@@ -13,7 +12,6 @@ from cli.commands.search import search
 from cli.commands.relationship import create_relationship, open_relationship
 from cli.commands.map import map_mission, map_entity
 from cli.commands.analyze import analyze_entity
-from cli.commands.status import mission_status
 from cli.commands.complete_mission import complete_mission
 from cli.commands.archive_mission import archive_mission
 from cli.commands.recon_nmap import recon_nmap
@@ -24,7 +22,6 @@ from cli.commands.timeline import show_timeline
 from cli.commands.chronicle import show_chronicle
 from cli.commands.report import show_report
 from cli.commands.mission import new_mission, start_mission, mission_status, stop_mission
-from core.parsers import mission_parser
 
 
 def main():
@@ -79,12 +76,12 @@ def main():
         help="Host to display",
     )
 
-    mission_parser = subparsers.add_parser(
+    mission_cmd_parser = subparsers.add_parser(
         "mission",
         help="Mission management",
     )
 
-    mission_subparsers = mission_parser.add_subparsers(
+    mission_subparsers = mission_cmd_parser.add_subparsers(
         dest="mission_command"
     )
 
@@ -294,7 +291,7 @@ def main():
             new_mission()
 
         else:
-            mission_parser.print_help()
+            mission_cmd_parser.print_help()
 
     elif args.command == "report":
         show_report(args.host)

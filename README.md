@@ -84,28 +84,50 @@ Knowledge is never discarded.
 It grows.
 
 ```
-        Scanner Output
-               │
-               ▼
-        Canonical Observation
-               │
-               ▼
-        Knowledge Graph
-               │
-      ┌────────┴────────┐
-      │                 │
-      ▼                 ▼
- Asset Profiles     Relationships
-      │                 │
-      └────────┬────────┘
-               ▼
-         History & Timeline
-               │
-               ▼
-        Differential Analysis
-               │
-               ▼
-      Intelligence & AI Analyst
+                        Reality
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+      Nmap          DNS          HTTPX
+        │             │             │
+        ▼             ▼             ▼
+     Sensors      Sensors      Sensors
+        │             │             │
+        ▼             ▼             ▼
+      Adapters     Adapters     Adapters
+        │             │             │
+        ▼             ▼             ▼
+      Parsers      Parsers      Parsers
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+                      ▼
+             Domain Observations
+                      │
+                      ▼
+             Observation Engine
+                      │
+                      ▼
+               Graph Builder
+                      │
+                      ▼
+              Knowledge Graph
+                      │
+                      ▼
+              Loom Repository
+                      │
+                      ▼
+                 Intelligence
+                      │
+          ┌───────────┼───────────┐
+          ▼           ▼           ▼
+      Timeline    Cartographer   Analyst
+                      │
+                      ▼
+                  Renderers
+                      │
+                      ▼
+                     CLI
 ```
 
 ---

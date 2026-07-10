@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "entity_type": "host",
+      "value": "45.33.32.156"
+    },
+    {
+      "entity_type": "port",
+      "value": "22"
+    },
+    {
+      "entity_type": "service",
+      "value": "ssh"
+    },
+    {
+      "entity_type": "product",
+      "value": "OpenSSH"
+    },
+    {
+      "entity_type": "version",
+      "value": "6.6.1p1"
+    }
+  ],
+  "edges": [
+    {
+      "source": {
+        "entity_type": "host",
+        "value": "45.33.32.156"
+      },
+      "relationship": "HAS_PORT",
+      "target": {
+        "entity_type": "port",
+        "value": "22"
+      }
+    },
+    {
+      "source": {
+        "entity_type": "port",
+        "value": "22"
+      },
+      "relationship": "RUNS_SERVICE",
+      "target": {
+        "entity_type": "service",
+        "value": "ssh"
+      }
+    },
+    {
+      "source": {
+        "entity_type": "service",
+        "value": "ssh"
+      },
+      "relationship": "HAS_PRODUCT",
+      "target": {
+        "entity_type": "product",
+        "value": "OpenSSH"
+      }
+    },
+    {
+      "source": {
+        "entity_type": "product",
+        "value": "OpenSSH"
+      },
+      "relationship": "HAS_VERSION",
+      "target": {
+        "entity_type": "version",
+        "value": "6.6.1p1"
+      }
+    }
+  ]
+}

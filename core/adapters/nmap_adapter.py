@@ -53,13 +53,14 @@ class NmapAdapter(ToolAdapter):
         translator = NmapObservationTranslator()
         graph = translator.build_graph(observations)
 
-        print()
-        print("═══════════════════════════════")
-        print("    KNOWLEDGE GRAPH")
-        print("═══════════════════════════════")
-        print(f"Nodes : {graph.node_count()}")
-        print(f"Edges : {graph.edge_count()}")
-        print()
+        from core.renderers.loom_renderer import LoomRenderer
+        LoomRenderer().render(graph)
+        
+        from core.renderers.knowledge_graph_renderer import (
+            KnowledgeGraphRenderer,
+        )
+
+        KnowledgeGraphRenderer().render(graph)
 
         # Emit canonical observations
         emitter = ObservationEmitter()
