@@ -15,7 +15,14 @@ class EntityResolver:
     def normalize(self, entity_type: str, value: str) -> str:
         value = value.strip()
 
-        if entity_type in {"domain", "email", "url", "hostname", "hash"}:
+        if entity_type in {
+            "domain",
+            "email",
+            "url",
+            "host",
+            "hostname",
+            "hash",
+        }:            
             return value.lower()
 
         if entity_type == "cve":

@@ -84,6 +84,127 @@ class ObservationEngine:
                 port_service,
             ])
 
+        elif observation.category == "http_endpoint":
+            data = observation.data
+
+            host = None
+            url = None
+            port = None
+
+            if data.get("host"):
+                host = self.entities.resolve(
+                    "host",
+                    data["host"],
+                )
+                resolved.append(host)
+
+            if data.get("url"):
+                url = self.entities.resolve(
+                    "url",
+                    data["url"],
+                )
+                resolved.append(url)
+
+            if data.get("port") is not None:
+                scheme = data.get("scheme") or "tcp"
+
+                port = self.entities.resolve(
+                    "port",
+                    f"{scheme}/{data['port']}",
+                )
+                resolved.append(port)
+
+            if host and port:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=host.id,
+                        target_id=port.id,
+                        relationship_type="exposes",
+                    )
+                )
+
+            if host and url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=host.id,
+                        target_id=url.id,
+                        relationship_type="exposes_url",
+                    )
+                )
+
+            if port and url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=port.id,
+                        target_id=url.id,
+                        relationship_type="serves_endpoint",
+                    )
+                )
+
+            if url and data.get("webserver"):
+                web_server = self.entities.resolve(
+                    "web_server",
+                    data["webserver"],
+                )
+
+                resolved.append(web_server)
+
+                relationships.append(
+                    self.relationships.create(
+                        source_id=url.id,
+                        target_id=web_server.id,
+                        relationship_type="served_by",
+                    )
+                )
+
+            if url:
+                for technology_value in data.get("technologies", []):
+                    if not technology_value:
+                        continue
+
+                    technology = self.entities.resolve(
+                        "technology",
+                        technology_value,
+                    )
+
+                    resolved.append(technology)
+
+                    relationships.append(
+                        self.relationships.create(
+                            source_id=url.id,
+                            target_id=technology.id,
+                            relationship_type="uses_technology",
+                        )
+                    )
+
+            if host:
+                addresses = []
+
+                if data.get("host_ip"):
+                    addresses.append(data["host_ip"])
+
+                addresses.extend(data.get("ipv4_addresses", []))
+                addresses.extend(data.get("ipv6_addresses", []))
+
+                for address in dict.fromkeys(addresses):
+                    if not address:
+                        continue
+
+                    ip = self.entities.resolve(
+                        "ip",
+                        address,
+                    )
+
+                    resolved.append(ip)
+
+                    relationships.append(
+                        self.relationships.create(
+                            source_id=host.id,
+                            target_id=ip.id,
+                            relationship_type="resolves_to",
+                        )
+                    )
+
         return {
             "entities": resolved,
             "relationships": relationships,
