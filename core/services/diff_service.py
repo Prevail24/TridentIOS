@@ -20,4 +20,11 @@ class DiffService:
             "services": diff("services"),
             "products": diff("products"),
             "versions": diff("versions"),
+
+            # HTTPX
+            "urls": diff("urls"),
+            "status_codes": diff("status_codes"),
+            "web_servers": diff("web_servers"),
+            "technologies": diff("technologies"),
+            "ip_addresses": diff("ip_addresses"),
         }
