@@ -11,6 +11,16 @@ class ObservationEngine:
         self.entities = EntityResolver()
         self.relationships = RelationshipEngine()
 
+    def _remember(self, entity, observation):
+        entity.add_observation(observation.id)
+
+        if observation.evidence_id:
+            entity.add_evidence(observation.evidence_id)
+
+        self.entities.repository.save(entity)
+
+        return entity
+
     def process(self, observation):
         resolved = []
         relationships = []
@@ -20,16 +30,19 @@ class ObservationEngine:
                 "host",
                 observation.data["host"],
             )
+            self._remember(host, observation)
 
             port = self.entities.resolve(
                 "port",
                 f'{observation.data["protocol"]}/{observation.data["port"]}',
             )
+            self._remember(port, observation)
 
             service = self.entities.resolve(
                 "service",
                 observation.data.get("service", "unknown"),
             )
+            self._remember(service, observation)
 
             product = None
             version = None
@@ -39,12 +52,14 @@ class ObservationEngine:
                     "product",
                     observation.data["product"],
                 )
+                self._remember(product, observation)
 
             if observation.data.get("version"):
                 version = self.entities.resolve(
                     "version",
                     observation.data["version"],
                 )
+                self._remember(version, observation)
 
             if product:
                 service_product = self.relationships.create(
@@ -96,6 +111,7 @@ class ObservationEngine:
                     "host",
                     data["host"],
                 )
+                self._remember(host, observation)
                 resolved.append(host)
 
             if data.get("url"):
@@ -103,6 +119,7 @@ class ObservationEngine:
                     "url",
                     data["url"],
                 )
+                self._remember(url, observation)
                 resolved.append(url)
 
             if data.get("port") is not None:
@@ -112,6 +129,7 @@ class ObservationEngine:
                     "port",
                     f"{scheme}/{data['port']}",
                 )
+                self._remember(port, observation)
                 resolved.append(port)
 
             if host and port:
@@ -146,6 +164,7 @@ class ObservationEngine:
                     "web_server",
                     data["webserver"],
                 )
+                self._remember(web_server, observation)
 
                 resolved.append(web_server)
 
@@ -166,6 +185,7 @@ class ObservationEngine:
                         "technology",
                         technology_value,
                     )
+                    self._remember(technology, observation)
 
                     resolved.append(technology)
 
@@ -194,6 +214,7 @@ class ObservationEngine:
                         "ip",
                         address,
                     )
+                    self._remember(ip, observation)
 
                     resolved.append(ip)
 
