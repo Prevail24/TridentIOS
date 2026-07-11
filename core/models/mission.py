@@ -81,9 +81,6 @@ class Mission:
         self.status = "completed"
         self.touch()
 
-    def archive(self):
-        self.status = "archived"
-        self.updated = date.today()
 
     def archive(self) -> None:
         self.status = "archived"

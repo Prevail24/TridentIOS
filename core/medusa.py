@@ -12,6 +12,8 @@ Precision before Power.
 """
 
 from core.serpents.archivist import Archivist
+from core.serpents.historian import Historian
+from core.serpents.sentinel import Sentinel
 from core.serpents.hunter import Hunter
 from core.serpents.oracle import Oracle
 
