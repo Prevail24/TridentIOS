@@ -1,6 +1,6 @@
 <p align="center">
 
-  <img src="assets/tridentIOS_dashboard_v1.png" width="100%" alt="Trident IOS Dashboard Concept">
+  <img src="assets/medusa_v2.png" width="100%" alt="Trident IOS Dashboard Concept">
 
 </p>
 
@@ -45,6 +45,176 @@ The goal is simple:
 
 ---
 
+# 🐍 Meet Medusa
+
+The Intelligence Core of Trident IOS
+
+Most cybersecurity platforms collect data.
+
+Some correlate it.
+
+A few visualize it.
+
+Medusa transforms it into intelligence.
+
+She is not another scanner.
+
+She is not another chatbot.
+
+She is the Intelligence Core that orchestrates every observation, every relationship, every timeline, and every investigation performed by Trident.
+
+Every tool becomes another sense.
+
+Every observation becomes another memory.
+
+Every mission makes her more informed.
+
+# The Intelligence Council
+
+Medusa does not think alone.
+
+She commands an Intelligence Council, where each member specializes in a different discipline.
+
+Serpent
+
+Responsibility
+
+📚 Archivist
+
+Perfect recall of every observation ever collected.
+
+🕰 Historian
+
+Reconstructs timelines and reveals how an environment has changed over time.
+
+👁 Sentinel
+
+Detects infrastructure drift, anomalies, and newly emerging risks.
+
+🎯 Hunter
+
+Identifies investigative opportunities and prioritizes where to look next.
+
+🔮 Oracle
+
+Forms evidence-based hypotheses from incomplete information.
+
+⚖ Skeptic
+
+Challenges assumptions and verifies every conclusion before it reaches the Observer.
+
+♟ Strategist
+
+Converts intelligence into operational plans.
+
+📢 Reporter
+
+Delivers concise mission briefings instead of overwhelming raw output.
+
+Together they answer a single question:
+
+Observer… what should we do next?
+
+⸻
+
+# Why Medusa Exists
+
+Traditional security tools answer questions like:
+
+* What ports are open?
+* What services are running?
+* What vulnerabilities exist?
+
+Those answers are valuable.
+
+But they are only evidence.
+
+Medusa asks a different question.
+
+What does it mean?
+
+She remembers everything she has ever learned.
+
+She connects observations across missions.
+
+She recognizes patterns invisible to isolated tools.
+
+She reconstructs the past.
+
+She identifies what changed.
+
+She reasons about what is most likely happening.
+
+She delivers intelligence—not noise.
+
+⸻
+
+# Intelligence Before Execution
+
+Scanning is easy.
+
+Understanding is difficult.
+
+Medusa exists to solve the difficult part.
+
+She helps the Observer understand the battlefield before action is required.
+
+Because…
+
+Intelligence wins before the first packet is sent.
+
+The battle is not won because you launched a scan.
+
+It is won because you understood the environment better than anyone else.
+
+Everything after that is execution.
+
+⸻
+
+The Medusa Doctrine
+
+She does not guess.
+
+She knows.
+
+⸻
+
+Traditional tools tell you what they found.
+
+Medusa tells you what it means.
+
+⸻
+
+Others react.
+
+Medusa prepares.
+
+⸻
+
+Turn Two is won by the person who turned Turn Two into Turn One.
+
+⸻
+
+Signals fade.
+
+Patterns persist.
+
+⸻
+
+# 🔱 The Vision
+
+One day, the Observer won’t think about Nmap, HTTPX, Nuclei, BloodHound, Shodan, or dozens of other tools.
+
+They will simply say:
+
+Observer> Brief me.
+
+And Medusa will answer with a complete, evidence-backed operational briefing built from everything Trident knows.
+
+That is the vision of Trident IOS.
+
+An Intelligence Operating System where tools collect evidence, but Medusa transforms evidence into understanding.
+
 # Why Trident?
 
 Modern cybersecurity relies on incredible tools.
@@ -84,50 +254,65 @@ Knowledge is never discarded.
 It grows.
 
 ```
-                        Reality
+                  Reality
                       │
-        ┌─────────────┼─────────────┐
-        │             │             │
-      Nmap          DNS          HTTPX
-        │             │             │
-        ▼             ▼             ▼
-     Sensors      Sensors      Sensors
-        │             │             │
-        ▼             ▼             ▼
-      Adapters     Adapters     Adapters
-        │             │             │
-        ▼             ▼             ▼
-      Parsers      Parsers      Parsers
-        │             │             │
-        └─────────────┼─────────────┘
+      ┌───────────────┬───────────────┬───────────────┐
+      │               │               │
+    Nmap            HTTPX            DNS
+      │               │               │
+      ▼               ▼               ▼
+   Sensors         Sensors         Sensors
+      │               │               │
+      ▼               ▼               ▼
+   Adapters        Adapters        Adapters
+      │               │               │
+      ▼               ▼               ▼
+    Parsers         Parsers         Parsers
+      │               │               │
+      └───────────────┴───────────────┘
                       │
                       ▼
              Domain Observations
                       │
                       ▼
-             Observation Engine
+              Observation Engine
                       │
                       ▼
-               Graph Builder
+                Knowledge Graph
                       │
                       ▼
-              Knowledge Graph
+               The Loom (Memory)
                       │
                       ▼
-              Loom Repository
+               MEDUSA ORCHESTRATOR
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+   Intelligence    Mission      Knowledge
+      Council      Context        Store
+        │             │             │
+        ▼             ▼             ▼
+                      
+ ┌──────────────────────────────────────────────┐
+ │              Intelligence Council            │
+ │                                              │
+ │ 📚 Archivist    - Remembers                  │
+ │ 🕰 Historian    - Reconstructs               │
+ │ 👁 Sentinel     - Detects Change             │
+ │ 🎯 Hunter       - Finds Opportunities        │
+ │ 🔮 Oracle       - Forms Hypotheses           │
+ │ ⚖ Skeptic      - Verifies Conclusions        │
+ │ ♟ Strategist   - Builds Plans                │
+ │ 📢 Reporter     - Delivers Briefings         │
+ └──────────────────────────────────────────────┘
                       │
                       ▼
                  Intelligence
                       │
-          ┌───────────┼───────────┐
-          ▼           ▼           ▼
-      Timeline    Cartographer   Analyst
+                      ▼
+                  Observer
                       │
                       ▼
-                  Renderers
-                      │
-                      ▼
-                     CLI
+      CLI • Desktop • API • Web • Mobile
 ```
 
 ---

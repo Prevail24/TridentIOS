@@ -6,7 +6,10 @@
          The Intelligence Core of
               Trident IOS
 
-        Precision Amplifys Power.
+Intelligence wins before the first packet is sent.
+Because the battle isnt won when the attack begins.
+Its won when youve already understood the battlefield.
+The first packet is simply when everyone else realizes the battle has started.
 
 ═══════════════════════════════════════════════════════
 """
