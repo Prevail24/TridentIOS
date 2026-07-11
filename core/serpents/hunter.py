@@ -5,47 +5,41 @@ class Hunter:
     """
     Seeker of Opportunity.
 
-    Examines known intelligence and suggests
-    the next investigative targets.
+    Examines a known host profile and identifies
+    promising directions for further investigation.
     """
 
     def __init__(self):
         self.profiles = HostProfileService()
 
     def hunt(self, host: str) -> list[str]:
-
         profile = self.profiles.build(host)
 
         if profile is None:
             return []
 
-        recommendations = []
+        ports = set(profile.get("ports", []))
+        services = set(profile.get("services", []))
+        products = set(profile.get("products", []))
 
-        #
-        # HTTPS available?
-        #
-        if "tcp/443" in profile["ports"]:
-            recommendations.append(
-                "Investigate HTTPS attack surface."
-            )
+        leads = []
 
-        #
-        # SSH exposed?
-        #
-        if "ssh" in profile["services"]:
-            recommendations.append(
-                "Enumerate SSH configuration."
-            )
+        if "tcp/22" in ports or "ssh" in services:
+            leads.append("Enumerate SSH configuration and authentication methods.")
 
-        #
-        # Apache detected?
-        #
-        if any(
-            "Apache" in product
-            for product in profile["products"]
-        ):
-            recommendations.append(
-                "Fingerprint Apache modules."
-            )
+        if "tcp/80" in ports or "http" in services:
+            leads.append("Investigate the HTTP application surface.")
 
-        return recommendations
+        if "tcp/443" in ports or "https" in services:
+            leads.append("Inspect HTTPS certificates, virtual hosts, and application routes.")
+
+        if "tcp/25" in ports or "smtp" in services:
+            leads.append("Investigate SMTP configuration and authorized enumeration paths.")
+
+        if any("Apache" in product for product in products):
+            leads.append("Fingerprint Apache modules and exposed application paths.")
+
+        if any("OpenSSH" in product for product in products):
+            leads.append("Review the detected OpenSSH version and supported authentication methods.")
+
+        return leads

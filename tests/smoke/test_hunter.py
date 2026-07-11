@@ -1,15 +1,16 @@
 from core.serpents.hunter import Hunter
 
+
 hunter = Hunter()
+
+leads = hunter.hunt("45.33.32.156")
 
 print()
 print("HUNTER")
 print("------")
 
-recommendations = hunter.hunt("45.33.32.156")
-
-if not recommendations:
-    print("No recommendations.")
+if not leads:
+    print("No investigative leads identified.")
 else:
-    for recommendation in recommendations:
-        print("-", recommendation)
+    for lead in leads:
+        print(f"- {lead}")
