@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -15,10 +15,11 @@ dependencies = [
     "rich>=13.0.0"
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["cli", "cli.*", "core", "core.*"]
-namespaces = false
-
 [project.scripts]
 trident = "cli.entrypoint:main"
+medusa = "cli.entrypoint:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cli*","core*"]
+namespaces = true

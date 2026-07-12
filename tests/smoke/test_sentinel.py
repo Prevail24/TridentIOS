@@ -1,36 +1,57 @@
+from core.events.event_bus import event_bus
 from core.serpents.sentinel import Sentinel
+from core.services.observation_service import ObservationService
+
 
 sentinel = Sentinel()
 
-report = sentinel.detect(
-    "RUN-2026-0030",
-    "RUN-2026-0031",
+event_bus.subscribe(
+    "ObservationCreated",
+    sentinel.handle,
 )
+
+service = ObservationService()
+
 
 print()
 print("SENTINEL")
-print("---------")
-print("Watching:", report["target"])
+print("--------")
 
-changes = report["changes"]
+print()
+print("FIRST OBSERVATION")
 
-empty = True
+service.create(
+    category="http",
+    data={
+        "host": "45.33.32.156",
+        "port": 80,
+        "server": "Apache",
+        "status": 200,
+    },
+)
 
-for category, diff in changes.items():
+print()
+print("SECOND OBSERVATION")
 
-    if diff["added"] or diff["removed"]:
+service.create(
+    category="http",
+    data={
+        "host": "45.33.32.156",
+        "port": 80,
+        "server": "Apache",
+        "status": 200,
+    },
+)
 
-        empty = False
+print()
+print("THIRD OBSERVATION")
 
-        print()
-        print(category.upper())
-
-        for item in diff["added"]:
-            print(f"+ {item}")
-
-        for item in diff["removed"]:
-            print(f"- {item}")
-
-if empty:
-    print()
-    print("No changes detected.")
+service.create(
+    category="http",
+    data={
+        "host": "45.33.32.156",
+        "port": 80,
+        "server": "nginx",
+        "status": 200,
+    },
+)
