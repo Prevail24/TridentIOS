@@ -17,7 +17,7 @@ from cli.commands.map import map_mission, map_entity
 from cli.commands.analyze import analyze_entity
 from cli.commands.complete_mission import complete_mission
 from cli.commands.archive_mission import archive_mission
-from cli.commands.recon_nmap import recon_nmap
+from cli.commands.recon_nmap import recon_nmap, medusa_strike
 from cli.commands.loom import show_loom
 from core.dashboards.observatory_dashboard import ObservatoryDashboard
 from cli.commands.host import show_host
@@ -26,6 +26,7 @@ from cli.commands.chronicle import show_chronicle
 from cli.commands.report import show_report
 from cli.commands.mission import new_mission, start_mission, mission_status, stop_mission
 from cli.commands.council import show_council
+
 
 
 
@@ -46,6 +47,16 @@ def main():
     )    
 
     subparsers = parser.add_subparsers(dest="command")
+
+    strike_parser = subparsers.add_parser(
+        "strike",
+        help="Launch an active reconnaissance strike",
+    )
+
+    strike_parser.add_argument(
+        "target",
+        help="Authorized target",
+    )
 
     council_parser = subparsers.add_parser(
         "council",
@@ -380,7 +391,8 @@ def main():
         else:
             relationship_parser.print_help()
     
-
+    elif args.command == "strike":
+        medusa_strike(args.target)
 
     else:
         ObservatoryDashboard().show()
