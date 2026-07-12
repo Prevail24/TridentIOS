@@ -1,6 +1,6 @@
 <p align="center">
 
-  <img src="assets/medusa_v2.png" width="100%" alt="Trident IOS Dashboard Concept">
+  <img src="assets/medusa_v3.png" width="100%" alt="Trident IOS Dashboard Concept">
 
 </p>
 
