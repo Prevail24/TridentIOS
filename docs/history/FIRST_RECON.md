@@ -29,6 +29,9 @@ and recorded a ToolRun.
 
 This marked the beginning of Expedition III.
 
+
+
+### July 13th - 2026 - HackTheBox Cap - Completion
 ￼
 This wasn’t Trident’s first successful operation.
 
