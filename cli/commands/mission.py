@@ -1,6 +1,5 @@
 from core.engine import TridentEngine
 from core.rendering.terminal_renderer import TerminalRenderer
-from core.services.active_mission_service import ActiveMissionService
 
 
 def new_mission() -> None:
@@ -52,7 +51,6 @@ TRD-PB-001 Quick Recon""",
 def start_mission(name: str) -> None:
     renderer = TerminalRenderer()
     engine = TridentEngine()
-    active = ActiveMissionService()
 
     result = engine.missions.create(
         title=name,
@@ -63,7 +61,7 @@ def start_mission(name: str) -> None:
         priority="normal",
     )
 
-    active.activate(result.mission.id)
+    engine.state.set_active_mission(result.mission.id)
 
     renderer.success(
         "🔱 Mission Activated",
@@ -84,15 +82,17 @@ Workspace
 missions/{result.mission.id}/""",
     )
 
-
 def mission_status() -> None:
     renderer = TerminalRenderer()
-    active = ActiveMissionService()
+    engine = TridentEngine()
 
-    mission_id = active.current()
+    mission_id = engine.state.get_active_mission()
 
     if mission_id is None:
-        renderer.warning("No Active Mission", "Start one with: trident mission start <name>")
+        renderer.warning(
+            "No Active Mission",
+            "Start one with: trident mission start <name>",
+        )
         return
 
     renderer.success(
@@ -102,18 +102,20 @@ def mission_status() -> None:
 {mission_id}""",
     )
 
-
 def stop_mission() -> None:
     renderer = TerminalRenderer()
-    active = ActiveMissionService()
+    engine = TridentEngine()
 
-    mission_id = active.current()
+    mission_id = engine.state.get_active_mission()
 
     if mission_id is None:
-        renderer.warning("No Active Mission", "There is no active mission to stop.")
+        renderer.warning(
+            "No Active Mission",
+            "There is no active mission to stop.",
+        )
         return
 
-    active.clear()
+    engine.state.clear_active_mission()
 
     renderer.success(
         "Mission Closed",

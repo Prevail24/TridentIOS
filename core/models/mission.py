@@ -1,18 +1,14 @@
 from dataclasses import dataclass, field
-from datetime import date,datetime
+from datetime import date
 from typing import Literal
 
- 
 
-
-@dataclass
-class Mission:
-    id: str
-    name: str
-    started_at: datetime
-    status: str = "ACTIVE"
-
-MissionStatus = Literal["active", "paused", "completed", "archived"]
+MissionStatus = Literal[
+    "active",
+    "paused",
+    "completed",
+    "archived",
+]
 
 
 @dataclass
