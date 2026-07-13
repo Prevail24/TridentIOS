@@ -1,7 +1,7 @@
 from core.sensors.nmap.sensor import NmapSensor
 from core.serpents.hunter import Hunter
 from cli.observer_shell import ObserverShell
-
+from core.archive.case_manager import CaseManager
 
 def medusa_strike(target: str):
     print()
@@ -15,7 +15,12 @@ def medusa_strike(target: str):
     print("Strike authorized.")
     print()
 
-    recon_nmap(target)
+    run = recon_nmap(target)
+    case = CaseManager().create_case(
+        target=target,
+        run_id=run.id,
+
+    )
 
     hunter = Hunter()
     leads = hunter.hunt(target)
@@ -34,8 +39,10 @@ def medusa_strike(target: str):
 
     ObserverShell(
         {
-            "host": target,
-            "hunter_leads": leads,
+        "host": target,
+        "run_id": run.id,
+        "case_id": case["case_id"],
+        "hunter_leads": leads,
         }
     ).run()
 
@@ -51,3 +58,5 @@ def recon_nmap(target: str):
     print()
     print(f"Run ID : {run.id}")
     print(f"Target : {target}")
+
+    return run
