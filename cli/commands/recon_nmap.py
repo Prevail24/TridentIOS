@@ -1,5 +1,6 @@
 from cli.observer_shell import ObserverShell
 from core.archive.case_manager import CaseManager
+from core.renderers.strike_renderer import StrikeRenderer
 from core.repositories.observation_repository import ObservationRepository
 from core.sensors.nmap.sensor import NmapSensor
 from core.serpents.hunter import Hunter
@@ -27,55 +28,64 @@ HTTP_SERVICE_MARKERS = {
 
 
 def medusa_strike(target: str):
-    print()
-    print("🐍 Medusa")
-    print("Council assembling...")
-    print()
-    print("👁 Sentinel  : Monitoring reality")
-    print("🎯 Hunter    : Preparing investigation")
-    print("📢 Reporter  : Standing by")
-    print()
-    print("Strike authorized.")
-    print()
+    renderer = StrikeRenderer()
 
-    # Foreground reconnaissance
+    # Nmap must complete before the Case can reference its primary run.
+    renderer.sensor_started("Nmap")
     nmap_run = recon_nmap(target)
+    renderer.sensor_finished(
+        "Nmap",
+        "Reconnaissance complete",
+    )
 
-    # Create the case from the primary reconnaissance run.
     case = CaseManager().create_case(
         target=target,
         run_id=nmap_run.id,
     )
 
-    # First sensor-trigger rule:
-    # only launch HTTPX when Nmap found an HTTP-capable surface.
+    renderer.header(
+        target=target,
+        case_id=case["case_id"],
+    )
+    renderer.council_online()
+
+    # Launch HTTPX only when Nmap identifies a web-capable surface.
     httpx_result = None
 
     if has_web_surface(nmap_run):
+        renderer.sensor_started("HTTPX")
         httpx_result = recon_httpx(target)
-    else:
-        print()
-        print("HTTPX")
-        print("-----")
-        print("No HTTP-capable surface detected.")
-        print("Sensor deferred.")
-        print()
 
-    # Hunter now evaluates after Nmap and HTTPX have populated the Loom.
+        if httpx_result:
+            observation_count = len(httpx_result["observations"])
+            renderer.sensor_finished(
+                "HTTPX",
+                f"{observation_count} observations collected",
+            )
+        else:
+            renderer.reporter(
+                "HTTPX failed or returned no usable results."
+            )
+    else:
+        renderer.reporter(
+            "No HTTP-capable surface detected. HTTPX deferred."
+        )
+
+    # Hunter evaluates the combined Nmap and HTTPX intelligence.
     hunter = Hunter()
     leads = hunter.hunt(target)
 
-    print()
-    print("═══════════════════════════════")
-    print("      HUNTER ASSESSMENT")
-    print("═══════════════════════════════")
-    print()
-
     if not leads:
-        print("No investigative leads identified.")
+        renderer.hunter(
+            "No investigative leads identified."
+        )
     else:
-        for index, lead in enumerate(leads, start=1):
-            print(f"{index}. {lead}")
+        renderer.hunter(
+            f"{len(leads)} investigative leads generated."
+        )
+
+        for lead in leads:
+            renderer.hunter(lead)
 
     context = {
         "host": target,
@@ -91,31 +101,43 @@ def medusa_strike(target: str):
         context["httpx_run_id"] = httpx_run.id
         context["httpx_observations"] = len(httpx_observations)
 
+    renderer.briefing()
+    renderer.reporter(
+        "Initial reconnaissance complete. Observer assuming command."
+    )
+
+    print()
+    print("═══════════════════════════════")
+    print("   MISSION BRIEFING COMPLETE")
+    print("═══════════════════════════════")
+    print()
+    print(f"Target       : {target}")
+    print(f"Case         : {case['case_id']}")
+    print(f"Nmap Run     : {nmap_run.id}")
+    print(f"Hunter Leads : {len(leads)}")
+
+    if httpx_result:
+        print(f"HTTPX Run    : {httpx_result['tool_run'].id}")
+        print(
+            f"HTTPX Obs    : "
+            f"{len(httpx_result['observations'])}"
+        )
+
+    print()
+    input("Press ENTER to assume command... ")
+    print()
+
     ObserverShell(context).run()
 
 
 def recon_nmap(target: str):
     sensor = NmapSensor(target)
-    run = sensor.collect()
-
-    print()
-    print("═══════════════════════════════")
-    print("      NMAP COMPLETE")
-    print("═══════════════════════════════")
-    print()
-    print(f"Run ID : {run.id}")
-    print(f"Target : {target}")
-    print()
-
-    return run
+    return sensor.collect()
 
 
 def has_web_surface(run) -> bool:
     """
-    Determine whether Nmap produced an open HTTP-capable service.
-
-    ToolRun stores observation IDs, so this function retrieves those
-    canonical observations from the Loom and evaluates their data.
+    Return True when Nmap produced an open HTTP-capable service.
     """
     repository = ObservationRepository()
 
@@ -141,64 +163,19 @@ def has_web_surface(run) -> bool:
         if port in HTTP_PORTS:
             return True
 
-        if any(marker in service for marker in HTTP_SERVICE_MARKERS):
+        if any(
+            marker in service
+            for marker in HTTP_SERVICE_MARKERS
+        ):
             return True
 
     return False
 
 
 def recon_httpx(target: str):
-    print()
-    print("═══════════════════════════════")
-    print("      HTTPX INITIATED")
-    print("═══════════════════════════════")
-    print()
-    print(f"Target : {target}")
-    print()
-
     try:
-        result = HttpxService().run(target)
+        return HttpxService().run(target)
     except FileNotFoundError:
-        print("HTTPX failed: executable not found.")
-        print("Confirm ProjectDiscovery httpx is installed and on PATH.")
-        print()
         return None
-    except Exception as exc:
-        print(f"HTTPX failed: {exc}")
-        print()
+    except Exception:
         return None
-
-    tool_run = result["tool_run"]
-    observations = result["observations"]
-
-    print()
-    print("═══════════════════════════════")
-    print("      HTTPX COMPLETE")
-    print("═══════════════════════════════")
-    print()
-    print(f"Run ID       : {tool_run.id}")
-    print(f"Target       : {target}")
-    print(f"Observations : {len(observations)}")
-    print()
-
-    for observation in observations:
-        data = observation.data or {}
-
-        url = data.get("url", "Unknown")
-        status = (
-            data.get("status_code")
-            or data.get("http_status")
-            or "Unknown"
-        )
-        title = (
-            data.get("title")
-            or data.get("page_title")
-            or "Untitled"
-        )
-
-        print(f"  {status}  {url}")
-        print(f"       {title}")
-
-    print()
-
-    return result
