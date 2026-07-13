@@ -5,7 +5,7 @@ from core.repositories.observation_repository import ObservationRepository
 from core.sensors.nmap.sensor import NmapSensor
 from core.serpents.hunter import Hunter
 from core.services.httpx_service import HttpxService
-
+from core.events.council_event import CouncilEvent
 
 HTTP_PORTS = {
     80,
@@ -80,12 +80,29 @@ def medusa_strike(target: str):
             "No investigative leads identified."
         )
     else:
-        renderer.hunter(
-            f"{len(leads)} investigative leads generated."
+        renderer.emit(
+            CouncilEvent(
+                actor="Hunter",
+                event_type="assessment",
+                message=f"{len(leads)} investigative leads generated.",
+                mission_id=case["case_id"],
+                tool_run_id=nmap_run.id,
+                data={
+                    "lead_count": len(leads),
+                },
+            )
         )
 
         for lead in leads:
-            renderer.hunter(lead)
+            renderer.emit(
+                CouncilEvent(
+                    actor="Hunter",
+                    event_type="lead",
+                    message=lead,
+                    mission_id=case["case_id"],
+                    tool_run_id=nmap_run.id,
+                )
+            )
 
     context = {
         "host": target,
@@ -102,8 +119,16 @@ def medusa_strike(target: str):
         context["httpx_observations"] = len(httpx_observations)
 
     renderer.briefing()
-    renderer.reporter(
-        "Initial reconnaissance complete. Observer assuming command."
+    renderer.emit(
+        CouncilEvent(
+            actor="Reporter",
+            event_type="mission_update",
+            message=(
+                "Initial reconnaissance complete. "
+                "Observer assuming command."
+            ),
+            mission_id=case["case_id"],
+        )
     )
 
     print()

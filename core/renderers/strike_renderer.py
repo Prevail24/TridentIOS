@@ -1,5 +1,6 @@
 from rich.console import Console
 from rich.rule import Rule
+from core.events.council_event import CouncilEvent
 
 console = Console()
 
@@ -13,6 +14,28 @@ class StrikeRenderer:
     Hunter emits intelligence.
     StrikeRenderer tells the story.
     """
+    def emit(self, event: CouncilEvent):
+        actor_styles = {
+            "Medusa": ("🐍", "bold green"),
+            "Sentinel": ("👁", "cyan"),
+            "Hunter": ("🎯", "yellow"),
+            "Reporter": ("📢", "green"),
+            "Historian": ("📚", "magenta"),
+            "Oracle": ("🔮", "bright_cyan"),
+            "Skeptic": ("⚖", "red"),
+            "Strategist": ("♞", "blue"),
+            "Advisor": ("🧠", "bright_magenta"),
+        }
+
+        icon, style = actor_styles.get(
+            event.actor,
+            ("•", "white"),
+        )
+
+        console.print(
+            f"[{style}]{icon} {event.actor}[/{style}]"
+            f" :: {event.message}"
+        )
 
     def header(self, target: str, case_id: str):
         console.print()
