@@ -1,20 +1,8 @@
 # Trident IOS Architecture Audit
 
-## Canonical Systems
-
-## Possible Duplicates
-
-## Deprecated / Legacy Candidates
-
-## Decisions
-
-## Next Refactor Targets
-
-# Trident IOS Architecture Audit
-
 ## Purpose
 
-This document tracks Trident IOS architecture decisions so we avoid duplicate systems, misplaced logic, and unnecessary rewrites.
+This document tracks Trident IOS architecture decisions as we grow so we avoid duplicate systems, misplaced logic, and unnecessary rewrites.
 
 ## Current Rule
 
@@ -28,6 +16,126 @@ Before adding a new feature:
 6. Commit one clean milestone.
 
 ## Canonical Systems
+
+### Mission Context
+
+Canonical location:
+
+- `core/kernel/mission_context.py`
+
+Responsibility:
+
+- Provide mission-scoped access to persisted intelligence.
+- Expose observations, tool runs, ports, services, and web surfaces.
+- Serve as the intelligence API for the Observer and Council.
+- Prevent higher layers from reading repositories directly.
+
+Rule:
+
+- Current-operation reasoning should use `MissionContext`.
+- Historical cross-mission reasoning may use the Loom and history services.
+
+### Observer Console
+
+Canonical locations:
+
+- `cli/observer_shell.py`
+- `cli/observer_dashboard.py`
+
+Responsibility:
+
+- Accept operator commands.
+- Route commands to Mission Context and Council systems.
+- Render investigation views.
+- Contain no scanning, persistence, or intelligence logic.
+
+Current commands:
+
+- `status`
+- `all`
+- `ports`
+- `services`
+- `web`
+- `observations`
+- `runs`
+- `hunter`
+- `clear`
+- `help`
+- `exit`
+
+### The Council
+
+Canonical location:
+
+- `core/council/`
+
+Current files:
+
+- `core/council/council.py`
+- `core/council/assessment.py`
+- `core/council/member.py`
+- `core/council/registry.py`
+
+Specialists:
+
+- `core/serpents/sentinel.py`
+- `core/serpents/hunter.py`
+- `core/serpents/historian.py`
+- `core/serpents/skeptic.py`
+- `core/serpents/reporter.py`
+- `core/serpents/oracle.py`
+
+Responsibility:
+
+- Interpret mission intelligence.
+- Produce assessments, recommendations, comparisons, warnings, summaries, and hypotheses.
+- Never create canonical facts.
+- Never execute tools directly.
+
+Rule:
+
+- Observations are facts.
+- Council assessments are interpretations.
+- Recommendations are never evidence.
+
+### Medusa
+
+Role:
+
+- Chief of Operations.
+
+Responsibility:
+
+- Coordinate strikes.
+- Dispatch sensors.
+- Convene Council members.
+- Maintain operational flow.
+- Present mission briefings.
+- Return control to the Observer.
+
+Rule:
+
+- Medusa coordinates.
+- The Council reasons.
+- The Serpents explore.
+- The Loom remembers.
+- The Observer commands.
+
+### Council Events
+
+Canonical location:
+
+- `core/events/council_event.py`
+
+Responsibility:
+
+- Represent immutable announcements emitted by Council members.
+- Carry actor, event type, mission identity, tool-run identity, message, and structured data.
+
+Distinction:
+
+- `CouncilEvent` represents something announced during operations.
+- `CouncilAssessment` represents the structured result of deliberate analysis.
 
 ### CLI
 
@@ -153,6 +261,33 @@ Canonical Loom renderer:
 
 ## Possible Duplicates
 
+### Active mission state
+
+Review:
+
+- `core/services/active_mission_service.py`
+- `core/services/state_service.py`
+
+Current direction:
+
+- `StateService` is canonical for active mission runtime state.
+- `ActiveMissionService` may be legacy and should be removed only after all callers migrate.
+
+### Council presentation and orchestration
+
+Review:
+
+- `cli/commands/council.py`
+- `core/council/council.py`
+- `core/renderers/strike_renderer.py`
+
+Decision direction:
+
+- CLI and renderers own presentation.
+- `core/council/council.py` owns orchestration.
+- `core/events/council_event.py` owns the event contract.
+- Presentation code must not contain Council reasoning.
+
 ### Graph-related
 
 Review later:
@@ -202,11 +337,31 @@ Nmap graph construction belongs near native Nmap observation creation, not insid
 
 `ToolRun.observations` stores observation IDs, not structured observation objects.
 
+### 2026-07-14
+
+`MissionContext` is the canonical API for active-mission intelligence.
+
+Hunter recommendations must use active-mission observations rather than accumulated historical host state.
+
+`HostProfileService` remains suitable for historical host knowledge and future Historian analysis.
+
+The Observer Shell routes commands and renders results but performs no intelligence.
+
+Medusa is the Chief of Operations, not a Council member.
+
+The Council never creates facts. It creates perspective from canonical observations.
+
+Core modules must not import from `cli`.
+
 ## Next Refactor Targets
 
-1. Clean `__pycache__` files from Git if tracked.
-2. Confirm canonical Nmap adapter.
-3. Confirm canonical graph renderer.
-4. Identify legacy graph models.
-5. Decide whether `LoomRepository` stays in `core/graph/` or moves to `core/repositories/`.
-6. Add architecture rule to README or docs.
+1. Confirm `StateService` as the only active-mission state system.
+2. Migrate remaining `ActiveMissionService` callers.
+3. Remove core-to-CLI imports.
+4. Finish the `CouncilAssessment` and `CouncilMember` contracts.
+5. Introduce the Council registry without replacing existing serpent logic.
+6. Adapt Hunter as the first registered Council member.
+7. Separate Council orchestration from Council presentation.
+8. Confirm canonical graph renderer and retire unused graph renderers.
+9. Confirm canonical Nmap adapter and remove the placeholder adapter.
+10. Correct ToolRun start and finish lifecycle timestamps.

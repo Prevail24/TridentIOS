@@ -1,4 +1,3 @@
-from cli.commands import host
 from core.serpents.hunter import Hunter
 from core.serpents.oracle import Oracle
 from core.serpents.skeptic import Skeptic

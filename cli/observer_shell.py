@@ -48,6 +48,9 @@ class ObserverShell:
 
             elif command == "runs":
                 self.show_runs()
+            
+            elif command == "observations":
+                self.show_observations()
 
             elif command == "ports":
                 self.show_ports()
@@ -71,17 +74,70 @@ class ObserverShell:
         print()
         print("Available Commands")
         print("------------------")
+        
         print("status    Show the Observatory dashboard")
         print("all       Show the complete mission intelligence view")
+        
         print("ports     Show open ports for the active mission")
         print("services  Show discovered network services")
         print("web       Show discovered HTTP surfaces")
+        print("observations  Show canonical mission observations")
+
         print("runs      Show tool runs for the active mission")
         print("hunter    Show Hunter's assessment")
+        
         print("clear     Redraw the Observatory")
         print("help      Show available commands")
         print("exit      Dismiss the Council")
         print()
+
+    def show_observations(self):
+        print()
+        print("══════════════════════════════════════")
+        print("          OBSERVATIONS")
+        print("══════════════════════════════════════")
+        print()
+
+        try:
+            observations = self.mission_context.mission_observations()
+        except RuntimeError as exc:
+            print(str(exc))
+            print()
+            return
+
+        if not observations:
+            print("No observations recorded.")
+            print()
+            return
+
+        for observation in observations:
+
+            print(observation.id)
+            print(f"  Category     : {observation.category}")
+
+            if observation.tool_run_id:
+                print(f"  Tool Run     : {observation.tool_run_id}")
+
+            if observation.evidence_id:
+                print(f"  Evidence     : {observation.evidence_id}")
+
+            print(f"  Confidence   : {observation.confidence}")
+            print(f"  Observed     : {observation.observed_at}")
+            print()
+
+            data = observation.data or {}
+
+            for key in sorted(data.keys()):
+                value = data[key]
+
+                if isinstance(value, list):
+                    value = ", ".join(str(v) for v in value)
+
+                print(f"    {key:<16}: {value}")
+
+            print()
+            print("──────────────────────────────────────")
+            print()
 
     def show_ports(self):
         print()
