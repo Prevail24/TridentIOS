@@ -1,7 +1,8 @@
 from core.services.host_profile_service import HostProfileService
 from core.events.event import Event
 from core.events.event_bus import EventBus, event_bus
-from core.services.host_profile_service import HostProfileService
+from core.kernel.mission_context import MissionContext
+
 
 class Hunter:
     """
@@ -45,6 +46,7 @@ class Hunter:
     def __init__(self, bus: EventBus | None = None) -> None:
         self.bus = bus if bus is not None else event_bus
         self.profiles = HostProfileService()
+        self.context = MissionContext()
 
     def handle(self, event: Event) -> None:
         if event.event_type != "InfrastructureChanged":
@@ -81,33 +83,80 @@ class Hunter:
         )
 
     def hunt(self, host: str) -> list[str]:
-        profile = self.profiles.build(host)
+            """
+            Generate leads from current-mission intelligence.
 
-        if profile is None:
-            return []
+            Historical host knowledge remains available through
+            HostProfileService, but active recommendations must be
+            grounded in the active mission.
+            """
+            try:
+                ports = self.context.open_ports()
+            except RuntimeError:
+                return []
 
-        ports = set(profile.get("ports", []))
-        services = set(profile.get("services", []))
-        products = set(profile.get("products", []))
+            host_ports = [
+                item
+                for item in ports
+                if item.get("host") == host
+            ]
 
-        leads = []
+            services = {
+                str(item.get("service", "")).lower()
+                for item in host_ports
+            }
 
-        if "tcp/22" in ports or "ssh" in services:
-            leads.append("Enumerate SSH configuration and authentication methods.")
+            products = {
+                str(item.get("product", "")).lower()
+                for item in host_ports
+                if item.get("product")
+            }
 
-        if "tcp/80" in ports or "http" in services:
-            leads.append("Investigate the HTTP application surface.")
+            port_numbers = {
+                item.get("port")
+                for item in host_ports
+            }
 
-        if "tcp/443" in ports or "https" in services:
-            leads.append("Inspect HTTPS certificates, virtual hosts, and application routes.")
+            leads = []
 
-        if "tcp/25" in ports or "smtp" in services:
-            leads.append("Investigate SMTP configuration and authorized enumeration paths.")
+            if 22 in port_numbers or "ssh" in services:
+                leads.append(
+                    "Enumerate SSH configuration and authentication methods."
+                )
 
-        if any("Apache" in product for product in products):
-            leads.append("Fingerprint Apache modules and exposed application paths.")
+            if 80 in port_numbers or "http" in services:
+                leads.append(
+                    "Investigate the HTTP application surface."
+                )
 
-        if any("OpenSSH" in product for product in products):
-            leads.append("Review the detected OpenSSH version and supported authentication methods.")
+            if 443 in port_numbers or "https" in services:
+                leads.append(
+                    "Inspect HTTPS certificates, virtual hosts, and application routes."
+                )
 
-        return leads
+            if 25 in port_numbers or "smtp" in services:
+                leads.append(
+                    "Investigate SMTP configuration and authorized enumeration paths."
+                )
+
+            if any("nginx" in product for product in products):
+                leads.append(
+                    "Fingerprint nginx configuration and exposed application paths."
+                )
+
+            if any("apache" in product for product in products):
+                leads.append(
+                    "Fingerprint Apache modules, virtual hosts, and exposed application paths."
+                )
+
+            if any("iis" in product for product in products):
+                leads.append(
+                    "Enumerate IIS modules, virtual directories, and installed applications."
+                )
+
+            if any("openssh" in product for product in products):
+                leads.append(
+                    "Review the detected OpenSSH version and supported authentication methods."
+                )
+
+            return leads
