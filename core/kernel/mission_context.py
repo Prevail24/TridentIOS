@@ -100,3 +100,65 @@ class MissionContext:
             "mission_id": self.current_mission_id(),
             **payload,
         }
+    
+    def services(self) -> list[dict]:
+        """
+        Return unique services discovered during the active mission.
+        """
+        services = {}
+
+        for port in self.open_ports():
+            name = port["service"]
+
+            if name not in services:
+                services[name] = {
+                    "service": name,
+                    "product": port["product"],
+                    "version": port["version"],
+                    "ports": [],
+                }
+
+            services[name]["ports"].append(port["port"])
+
+        return sorted(
+            services.values(),
+            key=lambda item: item["service"],
+        )    
+    
+    def web_surfaces(self) -> list[dict]:
+        """
+        Return HTTP endpoint intelligence for the active mission.
+        """
+        surfaces = []
+
+        for observation in self.mission_observations():
+            if observation.category != "http_endpoint":
+                continue
+
+            data = observation.data or {}
+
+            surfaces.append(
+                {
+                    "url": data.get("url", "Unknown"),
+                    "host": data.get("host", "Unknown"),
+                    "host_ip": data.get("host_ip"),
+                    "port": data.get("port"),
+                    "scheme": data.get("scheme"),
+                    "status_code": data.get("status_code"),
+                    "title": data.get("title"),
+                    "webserver": data.get("webserver"),
+                    "content_type": data.get("content_type"),
+                    "path": data.get("path"),
+                    "response_time": data.get("response_time"),
+                    "content_length": data.get("content_length"),
+                    "technologies": data.get("technologies") or [],
+                    "ipv4_addresses": data.get("ipv4_addresses") or [],
+                    "ipv6_addresses": data.get("ipv6_addresses") or [],
+                    "observation_id": observation.id,
+                }
+            )
+
+        return sorted(
+            surfaces,
+            key=lambda item: str(item["url"]),
+        )
