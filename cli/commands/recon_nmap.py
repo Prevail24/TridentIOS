@@ -6,6 +6,8 @@ from core.sensors.nmap.sensor import NmapSensor
 from core.serpents.hunter import Hunter
 from core.services.httpx_service import HttpxService
 from core.events.council_event import CouncilEvent
+from core.engine import TridentEngine
+
 
 HTTP_PORTS = {
     80,
@@ -26,13 +28,40 @@ HTTP_SERVICE_MARKERS = {
     "ssl/http",
 }
 
-
 def medusa_strike(target: str):
     renderer = StrikeRenderer()
+    engine = TridentEngine()
 
-    # Nmap must complete before the Case can reference its primary run.
+    # Medusa owns the complete mission lifecycle.
+    mission_result = engine.missions.create(
+        title=f"Medusa Strike - {target}",
+        mission_type="reconnaissance",
+        objective=f"Investigate and map the attack surface of {target}",
+        scope=target,
+        operator="Prevail",
+        priority="normal",
+    )
+
+    mission = mission_result.mission
+    engine.state.set_active_mission(mission.id)
+
+    renderer.emit(
+        CouncilEvent(
+            actor="Medusa",
+            event_type="mission_created",
+            message=f"Mission {mission.id} activated.",
+            mission_id=mission.id,
+            data={
+                "target": target,
+                "mission_type": mission.mission_type,
+            },
+        )
+    )
+
+    # Sensors now inherit the active mission automatically.
     renderer.sensor_started("Nmap")
     nmap_run = recon_nmap(target)
+
     renderer.sensor_finished(
         "Nmap",
         "Reconnaissance complete",
@@ -105,6 +134,7 @@ def medusa_strike(target: str):
             )
 
     context = {
+        "mission_id": mission.id,
         "host": target,
         "run_id": nmap_run.id,
         "case_id": case["case_id"],
@@ -136,10 +166,12 @@ def medusa_strike(target: str):
     print("   MISSION BRIEFING COMPLETE")
     print("═══════════════════════════════")
     print()
-    print(f"Target       : {target}")
+    print(f"Mission      : {mission.id}")
     print(f"Case         : {case['case_id']}")
+    print(f"Target       : {target}")
     print(f"Nmap Run     : {nmap_run.id}")
     print(f"Hunter Leads : {len(leads)}")
+    
 
     if httpx_result:
         print(f"HTTPX Run    : {httpx_result['tool_run'].id}")
