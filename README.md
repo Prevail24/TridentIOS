@@ -114,28 +114,71 @@ The architecture compounds.
 
 ---
 
-# Meet Medusa
+# 🐍 Meet Medusa
 
 ## Chief of Operations
 
-Medusa is not another AI assistant.
+Medusa is the operational heart of Trident.
 
-She is not another scanner.
+She does not perform reconnaissance.
 
-She is the operational heart of Trident.
+She does not reason like the Council.
+
+She does not make decisions for the Observer.
+
+She coordinates the entire investigation.
 
 Her responsibilities are simple.
 
 - Coordinate investigations.
-- Dispatch reconnaissance.
+
+- Dispatch reconnaissance assets.
+
 - Convene the Intelligence Council.
+
 - Maintain mission awareness.
+
 - Present operational briefings.
+
+- Orchestrate investigative workflows.
+
 - Keep the Observer informed.
 
 She does not investigate.
 
 She coordinates.
+
+---
+
+Large Language Models are not Medusa.
+
+They are tools she may choose to employ.
+
+Just as she dispatches Nmap to survey a network, 
+
+HTTPX to inspect web infrastructure, Gobuster and ffuf to uncover hidden paths, 
+
+Nuclei to identify known weaknesses, BloodHound to map privilege relationships, 
+
+Certipy to investigate Active Directory Certificate Services, 
+
+Volatility to examine memory, or Wireshark to inspect traffic, 
+
+she can also dispatch AI reasoning engines when deeper analysis is required.
+
+To Medusa, every capability is simply another Serpent.
+
+Some collect evidence.
+
+Some reason over evidence.
+
+All serve the Observer.
+
+To Medusa, an LLM is simply another specialist.
+
+One more Serpent serving the Observer.
+
+Just connect it.
 
 ---
 
