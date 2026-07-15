@@ -1,5 +1,6 @@
-from core.council.council_member import CouncilMember
 from core.serpents.hunter import Hunter
+from core.council.council_member import CouncilMember
+from core.serpents.historian import Historian
 
 
 class CouncilRegistry:
@@ -14,6 +15,7 @@ class CouncilRegistry:
         self._members: dict[str, CouncilMember] = {}
 
         self.register(Hunter())
+        self.register(Historian())
 
     def register(self, member: CouncilMember) -> None:
         name = member.name.strip().lower()
