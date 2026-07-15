@@ -1,16 +1,25 @@
 <p align="center">
 
-  <img src="assets/medusa_v3.png" width="100%" alt="Trident IOS Dashboard Concept">
+<img src="assets/medusa_v3.png" width="100%" alt="Trident IOS">
 
 </p>
 
-# 🔱 Trident IOS 🔱
+# 🔱 Trident IOS
+
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Status](https://img.shields.io/badge/Status-Active_Development-green)
+![Architecture](https://img.shields.io/badge/Architecture-Intelligence_OS-purple)
+![License](https://img.shields.io/badge/License-TBD-lightgrey)
+
+### **An Intelligence Operating System for Cybersecurity**
+
+> **The Observer commands. Medusa coordinates. The Council reasons. The Serpents explore. The Loom remembers.**
 
 ---
 
-# Origins
+## Origins
 
-Trident IOS began life as an experimental fork inspired by the architecture and ideas explored in the **Claude OSINT** project.
+Trident IOS began life as an experimental fork inspired by the architecture and ideas explored in the Claude OSINT project.
 
 That project helped spark the initial direction and demonstrated how an intelligence-first workflow could be organized.
 
@@ -20,489 +29,428 @@ We gratefully acknowledge that early inspiration while continuing to build Tride
 
 ---
 
-## Designed by
+# Designed by
 
 # **Prevail**
 
 *"Signals fade. Patterns persist."*
 
-
-## 🔱 Welcome to the Intelligence Operating System
-
-> **Observe. Remember. Reason.**
-
-Trident is an open-source Intelligence Operating System for cybersecurity.
-
-Traditional security tools produce output.
-
-Trident transforms that output into structured intelligence.
-
-Instead of treating every scan, report, or assessment as isolated text, Trident converts observations into a persistent knowledge graph that remembers what was discovered, how assets relate to one another, what has changed over time, and what deserves an analyst's attention.
-
-The goal is simple:
-
-> **Never make a human rediscover what Trident already knows.**
-
 ---
 
-# 🐍 Meet Medusa
+# What is Trident?
 
-The Intelligence Core of Trident IOS
-
-Most cybersecurity platforms collect data.
-
-Some correlate it.
-
-A few visualize it.
-
-Medusa transforms it into intelligence.
-
-She is not another scanner.
-
-She is not another chatbot.
-
-She is the Intelligence Core that orchestrates every observation, every relationship, every timeline, and every investigation performed by Trident.
-
-Every tool becomes another sense.
-
-Every observation becomes another memory.
-
-Every mission makes her more informed.
-
-# The Intelligence Council
-
-Medusa does not think alone.
-
-She commands an Intelligence Council, where each member specializes in a different discipline.
-
-Serpent
-
-Responsibility
-
-📚 Archivist
-
-Perfect recall of every observation ever collected.
-
-🕰 Historian
-
-Reconstructs timelines and reveals how an environment has changed over time.
-
-👁 Sentinel
-
-Detects infrastructure drift, anomalies, and newly emerging risks.
-
-🎯 Hunter
-
-Identifies investigative opportunities and prioritizes where to look next.
-
-🔮 Oracle
-
-Forms evidence-based hypotheses from incomplete information.
-
-⚖ Skeptic
-
-Challenges assumptions and verifies every conclusion before it reaches the Observer.
-
-♟ Strategist
-
-Converts intelligence into operational plans.
-
-📢 Reporter
-
-Delivers concise mission briefings instead of overwhelming raw output.
-
-Together they answer a single question:
-
-Observer… what should we do next?
-
-⸻
-
-# Why Medusa Exists
-
-Traditional security tools answer questions like:
-
-* What ports are open?
-* What services are running?
-* What vulnerabilities exist?
-
-Those answers are valuable.
-
-But they are only evidence.
-
-Medusa asks a different question.
-
-What does it mean?
-
-She remembers everything she has ever learned.
-
-She connects observations across missions.
-
-She recognizes patterns invisible to isolated tools.
-
-She reconstructs the past.
-
-She identifies what changed.
-
-She reasons about what is most likely happening.
-
-She delivers intelligence—not noise.
-
-⸻
-
-# Intelligence Before Execution
-
-Scanning is easy.
-
-Understanding is difficult.
-
-Medusa exists to solve the difficult part.
-
-She helps the Observer understand the battlefield before action is required.
-
-Because…
-
-Intelligence wins before the first packet is sent.
-
-The battle is not won because you launched a scan.
-
-It is won because you understood the environment better than anyone else.
-
-Everything after that is execution.
-
-⸻
-
-The Medusa Doctrine
-
-She does not guess.
-
-She knows.
-
-⸻
-
-Traditional tools tell you what they found.
-
-Medusa tells you what it means.
-
-⸻
-
-Others react.
-
-Medusa prepares.
-
-⸻
-
-Turn Two is won by the person who turned Turn Two into Turn One.
-
-⸻
-
-Signals fade.
-
-Patterns persist.
-
-⸻
-
-# 🔱 The Vision
-
-One day, the Observer won’t think about Nmap, HTTPX, Nuclei, BloodHound, Shodan, or dozens of other tools.
-
-They will simply say:
-
-Observer> Brief me.
-
-And Medusa will answer with a complete, evidence-backed operational briefing built from everything Trident knows.
-
-That is the vision of Trident IOS.
-
-An Intelligence Operating System where tools collect evidence, but Medusa transforms evidence into understanding.
-
-# Why Trident?
-
-Modern cybersecurity relies on incredible tools.
-
-- Nmap
-- HTTPX
-- Nuclei
-- BloodHound
-- linPEAS
-- winPEAS
-- Certipy
-- ffuf
-- and many more...
-
-These tools are excellent at collecting evidence.
-
-But they all answer the same question:
+Traditional cybersecurity tools answer one question.
 
 > **"What did I find?"**
 
-Trident answers a different question:
+Trident answers another.
 
 > **"What does it mean?"**
 
----
+Trident transforms raw security tool output into persistent intelligence.
 
-# The Philosophy
+Every scan becomes structured observations.
 
-Every piece of evidence becomes a standardized Observation.
+Every observation strengthens shared knowledge.
 
-Every Observation strengthens a shared Knowledge Graph.
+Every mission builds upon every mission before it.
 
-Every investigation builds upon previous investigations.
+Instead of producing isolated reports, Trident builds an evolving understanding of the environments it investigates.
 
-Knowledge is never discarded.
+It is not another scanner.
 
-It grows.
+It is not another SIEM.
 
-```
-                  Reality
-                      │
-      ┌───────────────┬───────────────┬───────────────┐
-      │               │               │
-    Nmap            HTTPX            DNS
-      │               │               │
-      ▼               ▼               ▼
-   Sensors         Sensors         Sensors
-      │               │               │
-      ▼               ▼               ▼
-   Adapters        Adapters        Adapters
-      │               │               │
-      ▼               ▼               ▼
-    Parsers         Parsers         Parsers
-      │               │               │
-      └───────────────┴───────────────┘
-                      │
-                      ▼
-             Domain Observations
-                      │
-                      ▼
-              Observation Engine
-                      │
-                      ▼
-                Knowledge Graph
-                      │
-                      ▼
-               The Loom (Memory)
-                      │
-                      ▼
-               MEDUSA ORCHESTRATOR
-        ┌─────────────┼─────────────┐
-        ▼             ▼             ▼
-   Intelligence    Mission      Knowledge
-      Council      Context        Store
-        │             │             │
-        ▼             ▼             ▼
-                      
- ┌──────────────────────────────────────────────┐
- │              Intelligence Council            │
- │                                              │
- │ 📚 Archivist    - Remembers                  │
- │ 🕰 Historian    - Reconstructs               │
- │ 👁 Sentinel     - Detects Change             │
- │ 🎯 Hunter       - Finds Opportunities        │
- │ 🔮 Oracle       - Forms Hypotheses           │
- │ ⚖ Skeptic      - Verifies Conclusions        │
- │ ♟ Strategist   - Builds Plans                │
- │ 📢 Reporter     - Delivers Briefings         │
- └──────────────────────────────────────────────┘
-                      │
-                      ▼
-                 Intelligence
-                      │
-                      ▼
-                  Observer
-                      │
-                      ▼
-      CLI • Desktop • API • Web • Mobile
-```
+It is not another chatbot.
 
----
-
-# Core Principles
-
-### Observe
-
-Collect observations from any security tool.
-
-### Remember
-
-Build a persistent intelligence archive.
-
-### Connect
-
-Relate assets, technologies, identities, services, vulnerabilities, and infrastructure.
-
-### Reason
-
-Identify changes, relationships, risks, and opportunities automatically.
-
-### Explain
-
-Transform complex technical output into understandable intelligence.
-
----
-
-# Current Capabilities
-
-✅ Canonical Observation Model
-
-✅ Entity Resolution
-
-✅ Relationship Graph
-
-✅ The Loom (Knowledge Explorer)
-
-✅ Host Profiles
-
-✅ Asset History
-
-✅ Differential Intelligence
-
-🚧 Timeline Engine
-
-🚧 Multi-Sensor Fusion
-
-🚧 AI Investigation Reports
-
-🚧 Risk & Interestingness Engine
+It is an **Intelligence Operating System.**
 
 ---
 
 # Architecture
 
 ```
-                    🔱 TRIDENT IOS 🔱
-
-                  COLLECTION LAYER
-──────────────────────────────────────────────────
-
-Nmap
-HTTPX
-DNS
-WHOIS
-SSL
-Nuclei
-linPEAS
-winPEAS
-BloodHound
-Certipy
-Cloud APIs
-...
-
-                    │
-                    ▼
-
-                OBSERVATION LAYER
-──────────────────────────────────────────────────
-
-Canonical Observations
-
-                    │
-                    ▼
-
-                 KNOWLEDGE LAYER
-──────────────────────────────────────────────────
-
-Entities
-
-Relationships
-
-Evidence
-
-History
-
-Host Profiles
-
-The Loom
-
-                    │
-                    ▼
-
-                 REASONING LAYER
-──────────────────────────────────────────────────
-
-Differential Analysis
-
-Timeline Engine
-
-Risk Engine
-
-Attack Path Analysis
-
-Recommendation Engine
-
-Interestingness Engine
-
-                    │
-                    ▼
-
-             INTELLIGENCE INTERFACE
-──────────────────────────────────────────────────
-
-CLI
-
-Web Application
-
-REST API
-
-AI Analyst
-
-Mission Reports
+                         👤 OBSERVER
+                    Human Mission Commander
+                               │
+                               ▼
+                        🐍 MEDUSA
+                 Chief of Operations
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+        ▼                      ▼                      ▼
+   🔱 Intelligence        🐍 Serpents           🕸 The Loom
+      Council          Reconnaissance         Knowledge Graph
+        │                      │                      ▲
+        └──────────────┬───────┘                      │
+                       ▼                              │
+                 Mission Context                      │
+                       ▲                              │
+                       │                              │
+                 Canonical Observations───────────────┘
+                       ▲
+                       │
+                    Sensors
 ```
+
+---
+
+# The Philosophy
+
+Every layer strengthens the layer beneath it.
+
+Reality becomes observations.
+
+Observations become knowledge.
+
+Knowledge becomes reasoning.
+
+Reasoning becomes intelligence.
+
+Intelligence empowers the Observer.
+
+The architecture compounds.
+
+---
+
+# Meet Medusa
+
+## Chief of Operations
+
+Medusa is not another AI assistant.
+
+She is not another scanner.
+
+She is the operational heart of Trident.
+
+Her responsibilities are simple.
+
+- Coordinate investigations.
+- Dispatch reconnaissance.
+- Convene the Intelligence Council.
+- Maintain mission awareness.
+- Present operational briefings.
+- Keep the Observer informed.
+
+She does not investigate.
+
+She coordinates.
+
+---
+
+# The Intelligence Council
+
+The Council is the reasoning layer of Trident.
+
+Every member has one responsibility.
+
+No overlap.
+
+No duplicated thinking.
+
+Every conclusion has an owner.
+
+---
+
+## 👁 Sentinel
+
+Observes change.
+
+Detects drift.
+
+Identifies anomalies.
+
+Never recommends action.
+
+---
+
+## 🎯 Hunter
+
+Finds investigative opportunities.
+
+Prioritizes the next step.
+
+Never invents evidence.
+
+---
+
+## 📚 Historian
+
+Remembers every mission.
+
+Builds timelines.
+
+Compares infrastructure across time.
+
+Never forgets.
+
+---
+
+## ⚖ Skeptic
+
+Questions assumptions.
+
+Measures confidence.
+
+Identifies missing evidence.
+
+Never accepts conclusions blindly.
+
+---
+
+## 🔮 Oracle
+
+Synthesizes evidence.
+
+Builds hypotheses.
+
+Connects incomplete information.
+
+Never creates facts.
+
+---
+
+## 📢 Reporter
+
+Transforms investigations into briefings.
+
+Produces mission summaries.
+
+Communicates intelligence.
+
+Never changes evidence.
+
+---
+
+# The Serpents
+
+The Serpents are Trident's reconnaissance specialists.
+
+Each specializes in collecting one type of intelligence.
+
+Examples include:
+
+- Nmap
+- HTTPX
+- Gobuster
+- Nuclei
+- BloodHound
+- Certipy
+- linPEAS
+- winPEAS
+- ffuf
+
+They do not interpret.
+
+They observe.
+
+---
+
+# The Loom
+
+The Loom is Trident's long-term memory.
+
+Everything discovered becomes connected.
+
+Hosts.
+
+Services.
+
+Technologies.
+
+Evidence.
+
+Relationships.
+
+Infrastructure.
+
+History.
+
+Nothing is forgotten.
+
+Every future mission begins smarter than the last.
+
+---
+
+# Mission Context
+
+Mission Context is the intelligence API.
+
+It organizes everything currently known about an active investigation.
+
+Every Council member reasons from Mission Context.
+
+Nothing above Mission Context reads repositories directly.
+
+This keeps every intelligence component speaking the same language.
+
+---
+
+# Why Trident is Different
+
+Most security platforms collect information.
+
+Some correlate it.
+
+Some visualize it.
+
+Trident reasons about it.
+
+Adding one new sensor does not simply add another feature.
+
+It strengthens:
+
+- Mission Context
+- The Loom
+- The Council
+- Medusa
+- Historical analysis
+- Future investigations
+
+Every capability amplifies the entire platform.
+
+---
+
+# Example Investigation
+
+```
+Observer> investigate 10.129.244.146
+
+🐍 Medusa
+Dispatching reconnaissance...
+
+👁 Sentinel
+Two new observations detected.
+
+🎯 Hunter
+HTTP enumeration recommended.
+
+🐍 Gobuster
+Discovery complete.
+
+📚 Historian
+/admin has never been observed before.
+
+⚖ Skeptic
+Additional validation recommended.
+
+🔮 Oracle
+Administrative interface is now the highest-value investigative path.
+
+📢 Reporter
+Mission briefing updated.
+
+🐍 Medusa
+Awaiting your next command, Observer.
+```
+
+---
+
+# Core Principles
+
+Observe.
+
+Remember.
+
+Connect.
+
+Reason.
+
+Explain.
+
+Learn.
+
+---
+
+# Current Capabilities
+
+✅ Mission Management
+
+✅ Canonical Observation Model
+
+✅ Tool Run Tracking
+
+✅ Knowledge Graph (The Loom)
+
+✅ Entity Resolution
+
+✅ Relationship Graph
+
+✅ Host Profiles
+
+✅ Mission Context
+
+✅ Hunter Intelligence
+
+✅ Observer Console
+
+✅ Medusa Operations Console
+
+🚧 Historian Timeline Engine
+
+🚧 Skeptic Confidence Engine
+
+🚧 Oracle Hypothesis Engine
+
+🚧 Reporter Mission Briefings
+
+🚧 AI Reasoning Integration
 
 ---
 
 # Long-Term Vision
 
-Imagine running a cybersecurity assessment and asking:
+One day the Observer will not think about Nmap.
 
-> "What changed since last month?"
+Or HTTPX.
 
-> "Which hosts are becoming riskier?"
+Or BloodHound.
 
-> "Which findings matter most?"
+Or Nuclei.
 
-> "Explain this linPEAS report."
+They will simply ask:
 
-> "Show me every attack path leading to Domain Admin."
+```
+Observer> brief me
+```
 
-Instead of manually correlating thousands of lines of output, Trident continuously builds an evolving model of the environment and provides the context required to make informed decisions.
+And Medusa will respond with a complete operational briefing built from everything Trident has ever learned.
 
-The goal is not to replace analysts.
+That is the vision.
 
-The goal is to amplify them.
+An Intelligence Operating System.
 
 ---
 
 # Educational Mission
 
-Trident is designed to help experienced professionals move faster while making advanced cybersecurity concepts significantly more approachable for newcomers.
+Trident is designed to help cybersecurity professionals move faster while making advanced concepts dramatically easier to understand.
 
-Rather than replacing industry tools like Nmap, BloodHound, linPEAS, or winPEAS, Trident provides context, relationships, and explanations that help users understand **why** findings matter and how they connect.
+It does not replace great security tools.
 
-Learning should begin with understanding—not information overload.
+It gives them memory.
 
----
+Relationships.
 
-# Current Status
+Context.
 
-Trident is under active development.
-
-The platform is being built incrementally with a strong emphasis on architecture, modularity, extensibility, and long-term maintainability.
-
-Every capability is designed as an independent intelligence service that contributes to a shared knowledge graph.
+Meaning.
 
 ---
 
-# License
+> "The Observer commands.
+>
+> Medusa coordinates.
+>
+> The Council reasons.
+>
+> The Serpents explore.
+>
+> The Loom remembers.
+>
+> Reality changes.
+>
+> **Trident learns.**"
 
-(To be determined)
-
----
-
-# Motto
-
-> **Observe. Remember. Reason.**
-
-> **From Observations to Intelligence.**
-
-🔱
+**Welcome to the Observatory.**
