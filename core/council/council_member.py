@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
-from core.council.assessment import CouncilAssessment
+from core.council.council_assessment import CouncilAssessment
 from core.kernel.mission_context import MissionContext
 
 
 class CouncilMember(ABC):
     """
-    Base interface implemented by every Council member.
+    Base contract implemented by every Council specialist.
     """
 
     name: str
@@ -14,6 +14,9 @@ class CouncilMember(ABC):
     @abstractmethod
     def assess(
         self,
-        mission: MissionContext,
+        context: MissionContext,
     ) -> CouncilAssessment:
+        """
+        Produce an assessment from the current mission.
+        """
         ...

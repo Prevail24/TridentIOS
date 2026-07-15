@@ -120,33 +120,80 @@ The architecture compounds.
 
 Medusa is the operational heart of Trident.
 
-She does not perform reconnaissance.
+She is neither a scanner nor an analyst.
 
-She does not reason like the Council.
+She is the Chief of Operations.
 
-She does not make decisions for the Observer.
+Every investigation flows through her.
 
-She coordinates the entire investigation.
+Every mission is coordinated by her.
+
+Every specialist answers her call.
 
 Her responsibilities are simple.
 
 - Coordinate investigations.
-
 - Dispatch reconnaissance assets.
-
 - Convene the Intelligence Council.
-
-- Maintain mission awareness.
-
-- Present operational briefings.
-
+- Maintain operational awareness.
 - Orchestrate investigative workflows.
-
+- Present mission briefings.
 - Keep the Observer informed.
 
 She does not investigate.
 
 She coordinates.
+
+---
+
+To Medusa, there is no distinction between traditional cybersecurity tools and artificial intelligence.
+
+There are only specialists.
+
+When reconnaissance is required, she may dispatch:
+
+- Nmap
+- HTTPX
+- Gobuster
+- ffuf
+- Nuclei
+- BloodHound
+- Certipy
+- NetExec
+- Impacket
+- Responder
+- Kerbrute
+- Burp Suite
+- Wireshark
+- Volatility
+- YARA
+- Sigma
+- Suricata
+- Zeek
+
+When deeper reasoning is required, she may dispatch one or more AI specialists.
+
+Today's specialists may include ChatGPT, Claude, Gemini, Grok, or future reasoning systems yet to be created.
+
+To Medusa, they are not products.
+
+They are Serpents.
+
+Some observe.
+
+Some remember.
+
+Some reason.
+
+Some predict.
+
+Each possesses unique expertise.
+
+Each is dispatched only when their abilities are required.
+
+Every specialist serves the mission.
+
+Every mission serves the Observer.
 
 ---
 

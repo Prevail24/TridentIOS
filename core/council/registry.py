@@ -1,20 +1,18 @@
-from core.serpents.hunter import Hunter
-
 class CouncilRegistry:
     """
-    Registry of available Council members.
+    Holds the active Council members.
 
-    Eventually this becomes the discovery mechanism for the
-    entire Council.
+    Medusa convenes the registry.
+
+    The registry owns membership,
+    not deliberation.
     """
 
     def __init__(self):
-        self._members = {
-            "hunter": Hunter(),
-        }
+        self.members = []
 
-    def get(self, name: str):
-        return self._members[name.lower()]
+    def register(self, member):
+        self.members.append(member)
 
-    def members(self):
-        return self._members
+    def all(self):
+        return list(self.members)
