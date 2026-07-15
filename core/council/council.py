@@ -1,44 +1,31 @@
-from core.serpents.hunter import Hunter
-from core.serpents.oracle import Oracle
-from core.serpents.skeptic import Skeptic
-from core.serpents.reporter import Reporter
+from core.council.council_assessment import CouncilAssessment
+from core.council.registry import CouncilRegistry
+from core.kernel.mission_context import MissionContext
 
 
 class Council:
     """
-    Coordinates TridentIOS Council deliberation.
+    Convenes the Intelligence Council.
 
-    Serpents remain independent specialists.
-    The Council invokes their public interfaces and
-    assembles their separate intelligence artifacts.
+    The Council performs no specialist analysis itself.
+    It gathers assessments from every registered member
+    and returns them to Medusa.
     """
 
-    def __init__(self) -> None:
-        self.hunter = Hunter()
-        self.oracle = Oracle()
-        self.skeptic = Skeptic()
-        self.reporter = Reporter()
+    def __init__(
+        self,
+        registry: CouncilRegistry | None = None,
+    ) -> None:
+        self.registry = registry or CouncilRegistry()
 
-    def deliberate(self, host: str) -> dict:
+    def deliberate(
+        self,
+        context: MissionContext,
+    ) -> list[CouncilAssessment]:
         """
-        Convene the available Council members for a host.
-
-        Returns:
-            A structured collection containing Hunter
-            recommendations, Oracle theories, and Skeptic reviews.
+        Convene every registered Council member.
         """
-        recommendations = self.hunter.hunt(host)
-        theories = self.oracle.hypothesize(host)
-        reviews = self.skeptic.review(theories)
-
-    
-        briefing = {
-            "host": host,
-            "recommendations": recommendations,
-            "theories": theories,
-            "reviews": reviews,
-        }
-
-        self.reporter.brief(briefing)
-
-        return briefing
+        return [
+            member.assess(context)
+            for member in self.registry.all()
+        ]
