@@ -1,16 +1,22 @@
 from core.services.host_profile_service import HostProfileService
 from core.events.event import Event
 from core.events.event_bus import EventBus, event_bus
+from core.council.council_assessment import CouncilAssessment
+from core.council.council_member import CouncilMember
 from core.kernel.mission_context import MissionContext
 
 
-class Hunter:
+
+class Hunter(CouncilMember):
     """
     Seeker of Opportunity.
 
     Examines a known host profile and identifies
     promising directions for further investigation.
     """
+
+    name = "Hunter"
+
     CHANGE_RECOMMENDATIONS = {
         "http": [
             "Run HTTP content discovery.",
@@ -160,3 +166,64 @@ class Hunter:
                 )
 
             return leads
+    
+    def assess(
+        self,
+        context: MissionContext,
+    ) -> CouncilAssessment:
+        """
+        Produce Hunter's current-mission assessment.
+
+        The existing hunt() interface remains available for
+        compatibility with strike orchestration.
+        """
+        ports = context.open_ports()
+
+        hosts = sorted(
+            {
+                str(item.get("host"))
+                for item in ports
+                if item.get("host")
+            }
+        )
+
+        if not hosts:
+            return CouncilAssessment(
+                member=self.name,
+                summary="No active host intelligence is available.",
+                confidence=0.0,
+                warnings=[
+                    "Hunter cannot recommend an investigative path "
+                    "without a discovered host."
+                ],
+            )
+
+        recommendations = []
+
+        for host in hosts:
+            for lead in self.hunt(host):
+                if lead not in recommendations:
+                    recommendations.append(lead)
+
+        if not recommendations:
+            return CouncilAssessment(
+                member=self.name,
+                summary="No investigative opportunities identified.",
+                confidence=0.5,
+                findings=[
+                    f"{len(hosts)} host or hosts reviewed."
+                ],
+            )
+
+        return CouncilAssessment(
+            member=self.name,
+            summary=(
+                f"{len(recommendations)} investigative "
+                "opportunities identified."
+            ),
+            confidence=1.0,
+            findings=[
+                f"{len(hosts)} active mission host or hosts reviewed."
+            ],
+            recommendations=recommendations,
+        )

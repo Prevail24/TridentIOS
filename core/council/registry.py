@@ -1,18 +1,39 @@
+from core.council.council_member import CouncilMember
+from core.serpents.hunter import Hunter
+
+
 class CouncilRegistry:
     """
     Holds the active Council members.
 
     Medusa convenes the registry.
-
-    The registry owns membership,
-    not deliberation.
+    The registry owns membership, not deliberation.
     """
 
     def __init__(self):
-        self.members = []
+        self._members: dict[str, CouncilMember] = {}
 
-    def register(self, member):
-        self.members.append(member)
+        self.register(Hunter())
 
-    def all(self):
-        return list(self.members)
+    def register(self, member: CouncilMember) -> None:
+        name = member.name.strip().lower()
+
+        if not name:
+            raise ValueError(
+                "Council members must define a name."
+            )
+
+        self._members[name] = member
+
+    def get(self, name: str) -> CouncilMember:
+        key = name.strip().lower()
+
+        if key not in self._members:
+            raise KeyError(
+                f"Council member not registered: {name}"
+            )
+
+        return self._members[key]
+
+    def all(self) -> list[CouncilMember]:
+        return list(self._members.values())
