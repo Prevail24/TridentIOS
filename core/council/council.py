@@ -1,4 +1,5 @@
 from core.council.council_assessment import CouncilAssessment
+from core.council.council_session import CouncilSession
 from core.council.registry import CouncilRegistry
 from core.kernel.mission_context import MissionContext
 
@@ -21,11 +22,15 @@ class Council:
     def deliberate(
         self,
         context: MissionContext,
-    ) -> list[CouncilAssessment]:
+    ) -> CouncilSession:
         """
         Convene every registered Council member.
         """
-        return [
-            member.assess(context)
-            for member in self.registry.all()
-        ]
+        session = CouncilSession(context)
+
+        for member in self.registry.all():
+            session.add(
+                member.assess(context)
+            )
+
+        return session
