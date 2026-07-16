@@ -1,6 +1,6 @@
 <p align="center">
 
-<img src="assets/medusa_v3.png" width="100%" alt="Trident IOS">
+<img src="assets/tridentIOS_banner_v1.png" width="100%" alt="Trident IOS">
 
 </p>
 
@@ -67,6 +67,14 @@ It is an **Intelligence Operating System.**
 
 ---
 
+---
+
+<p align="center">
+<img src="assets/architecture_banner_v1.png" width="100%" alt="Architecture">
+</p>
+
+---
+
 # Architecture
 
 ```
@@ -111,6 +119,12 @@ Reasoning becomes intelligence.
 Intelligence empowers the Observer.
 
 The architecture compounds.
+
+---
+
+<p align="center">
+<img src="assets/medusa_v3.png" width="100%" alt="Medusa">
+</p>
 
 ---
 
@@ -229,6 +243,11 @@ Just connect it.
 
 ---
 
+<p align="center">
+<img src="assets/the_serpants_v1.png" width="100%" alt="The Serpents">
+</p>
+
+---
 # The Intelligence Council
 
 The Council is the reasoning layer of Trident.
@@ -337,6 +356,47 @@ They observe.
 
 ---
 
+<p align="center">
+<img src="assets/ai_layer.png" width="100%" alt="AI Integration">
+</p>
+
+---
+
+# AI Is A Specialist, Not The System
+
+Artificial intelligence is woven throughout Trident—not as a replacement for operators, but as another class of specialist.
+
+Medusa may dispatch reasoning engines alongside traditional reconnaissance tools whenever deeper analysis is required.
+
+AI can assist with:
+
+- CTF walkthroughs
+- Malware analysis
+- Threat hunting
+- Red team planning
+- Enterprise investigations
+- Mission brief generation
+- Knowledge synthesis
+- Strategic reasoning
+
+The Observer remains in command.
+
+Medusa coordinates.
+
+The Council deliberates.
+
+AI amplifies.
+
+It never replaces human judgment.
+
+---
+
+<p align="center">
+<img src="assets/loom_banner_v1.png" width="100%" alt="The Loom">
+</p>
+
+---
+
 # The Loom
 
 The Loom is Trident's long-term memory.
@@ -402,6 +462,11 @@ Every capability amplifies the entire platform.
 
 ---
 
+<p align="center">
+<img src="assets/mission_lifecycle_v1.png" width="100%" alt="Mission Lifecycle">
+</p>
+
+---
 # Example Investigation
 
 ```
@@ -434,6 +499,12 @@ Mission briefing updated.
 🐍 Medusa
 Awaiting your next command, Observer.
 ```
+
+---
+
+<p align="center">
+<img src="assets/canonical_architecture_v1.png" width="100%" alt="Canonical Architecture">
+</p>
 
 ---
 
@@ -489,6 +560,12 @@ Learn.
 
 ---
 
+<p align="center">
+<img src="assets/the_future_v1.png" width="100%" alt="The Future">
+</p>
+
+---
+
 # Long-Term Vision
 
 One day the Observer will not think about Nmap.
@@ -513,34 +590,21 @@ An Intelligence Operating System.
 
 ---
 
-# Educational Mission
 
-Trident is designed to help cybersecurity professionals move faster while making advanced concepts dramatically easier to understand.
-
-It does not replace great security tools.
-
-It gives them memory.
-
-Relationships.
-
-Context.
-
-Meaning.
-
----
-
-> "The Observer commands.
+> "The Observatory will grow.
 >
-> Medusa coordinates.
+> The Council will expand.
 >
-> The Council reasons.
+> The Loom will span continents.
 >
-> The Serpents explore.
+> Artificial intelligence will become another specialist.
 >
-> The Loom remembers.
+> Autonomous agents will execute missions.
 >
-> Reality changes.
+> And every investigation will make the next one smarter.
+>
+>This is not the future of Trident.
 >
 > **Trident learns.**"
 
-**Welcome to the Observatory.**
+**This is the future of cyber intelligence.**
