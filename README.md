@@ -67,6 +67,8 @@ It is an **Intelligence Operating System.**
 
 ---
 
+# Architecture
+
 <p align="center">
 <img src="assets/architecture_banner_v1.png" width="100%" alt="Architecture">
 </p>
@@ -120,13 +122,15 @@ The architecture compounds.
 
 ---
 
+# 🐍 Medusa
+
 <p align="center">
 <img src="assets/medusa_v3.png" width="100%" alt="Medusa">
 </p>
 
 ---
 
-# 🐍 Meet Medusa
+# 🐍 Medusa
 
 ## Chief of Operations
 
@@ -241,6 +245,8 @@ Just connect it.
 
 ---
 
+# The Serpents
+
 <p align="center">
 <img src="assets/the_serpants_v1.png" width="100%" alt="The Serpents">
 </p>
@@ -353,6 +359,8 @@ They do not interpret.
 They observe.
 
 ---
+
+# AI
 
 <p align="center">
 <img src="assets/ai_layer.png" width="100%" alt="AI Integration">
