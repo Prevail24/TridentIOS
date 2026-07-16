@@ -2,7 +2,7 @@ from cli.observer_shell import ObserverShell
 from core.archive.case_manager import CaseManager
 from core.renderers.strike_renderer import StrikeRenderer
 from core.repositories.observation_repository import ObservationRepository
-from core.sensors.nmap.sensor import NmapSensor
+from core.armory.nmap.sensor import NmapSensor
 from core.serpents.hunter import Hunter
 from core.services.httpx_service import HttpxService
 from core.events.council_event import CouncilEvent

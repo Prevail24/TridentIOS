@@ -1,6 +1,6 @@
 from core.engine import TridentEngine
 from core.parsers.httpx.json_parser import HttpxJsonParser
-from core.sensors.httpx.sensor import HttpxSensor
+from core.armory.httpx.sensor import HttpxSensor
 from core.services.httpx_observation_translator import (
     HttpxObservationTranslator,
 )

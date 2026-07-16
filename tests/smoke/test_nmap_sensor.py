@@ -1,4 +1,4 @@
-from core.sensors.nmap.sensor import NmapSensor
+from core.armory.nmap.sensor import NmapSensor
 
 sensor = NmapSensor("scanme.nmap.org")
 

@@ -1,5 +1,5 @@
-from core.sensors.sensor_registry import SensorRegistry
-from core.sensors.nmap.sensor import NmapSensor
+from core.armory.sensor_registry import SensorRegistry
+from core.armory.nmap.sensor import NmapSensor
 
 
 registry = SensorRegistry()

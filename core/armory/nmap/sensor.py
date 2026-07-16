@@ -1,4 +1,4 @@
-from core.sensors.sensor import Sensor
+from core.armory.sensor import Sensor
 from core.adapters.nmap_adapter import NmapAdapter
 
 class NmapSensor(Sensor):
