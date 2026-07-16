@@ -1,57 +1,56 @@
 """
 ═══════════════════════════════════════════════════════
 
-                MEDUSA
+                      MEDUSA
 
-         The Intelligence Core of
-              Trident IOS
+                Chief of Operations
+                   Trident IOS
 
-Intelligence wins before the first packet is sent.
-Because the battle isnt won when the attack begins.
-Its won when youve already understood the battlefield.
-The first packet is simply when everyone else realizes the battle has started.
+The Observer commands.
+Medusa coordinates.
+The Council reasons.
+The Serpents explore.
+The Loom remembers.
 
 ═══════════════════════════════════════════════════════
 """
 
-from core.serpents.archivist import Archivist
-
-from core.serpents.historian import Historian
-
-from core.serpents.sentinel import Sentinel
-
-from core.serpents.hunter import Hunter
-
-from core.serpents.oracle import Oracle
-
-from core.serpents.skeptic import Skeptic
-
-from core.serpents.strategist import Strategist
-
+from core.briefings.mission_brief import MissionBrief
+from core.council.council import Council
+from core.kernel.mission_context import MissionContext
 from core.serpents.reporter import Reporter
 
+
 class Medusa:
-
     """
-    Orchestrates Trident's Intelligence Council.
-    Medusa owns coordination.
-    The Serpents own their individual disciplines.
+    Chief of Operations for Trident IOS.
+
+    Medusa coordinates operational systems.
+    She does not perform specialist analysis herself.
     """
 
-    def __init__(self):
-        self.archivist = Archivist()
-        self.historian = Historian()
-        self.sentinel = Sentinel()
-        self.hunter = Hunter()
-        self.oracle = Oracle()
-        self.skeptic = Skeptic()
-        self.strategist = Strategist()
-        self.reporter = Reporter()
+    def __init__(
+        self,
+        council: Council | None = None,
+        reporter: Reporter | None = None,
+    ) -> None:
+        self.council = council or Council()
+        self.reporter = reporter or Reporter()
 
-    def brief(self, host: str) -> str:
-
+    def brief(
+        self,
+        context: MissionContext | None = None,
+    ) -> MissionBrief:
         """
-        Return the council's operational briefing for a host.
+        Convene the Council and return an operational briefing
+        for the active mission.
         """
+        mission_context = context or MissionContext()
 
-        return self.reporter.brief(host)
+        session = self.council.deliberate(
+            mission_context
+        )
+
+        return self.reporter.brief(
+            session
+        )
