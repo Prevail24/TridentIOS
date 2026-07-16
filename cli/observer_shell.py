@@ -1,5 +1,6 @@
 from cli.observer_dashboard import ObserverDashboard
 from core.kernel.mission_context import MissionContext
+from core.services.gobuster_service import GobusterService
 
 
 class ObserverShell:
@@ -20,8 +21,10 @@ class ObserverShell:
 
         while True:
             try:
-                command = input("Observer> ").strip().lower()
+                raw_command = input("Observer> ").strip()
+                command = raw_command.lower()
             except (KeyboardInterrupt, EOFError):
+                raw_command = "exit"
                 command = "exit"
 
             if command in ("exit", "quit"):
@@ -48,6 +51,9 @@ class ObserverShell:
 
             elif command == "runs":
                 self.show_runs()
+
+            elif command.startswith("gobuster"):
+                self.run_gobuster(raw_command)
             
             elif command == "observations":
                 self.show_observations()
@@ -82,6 +88,9 @@ class ObserverShell:
         print("services  Show discovered network services")
         print("web       Show discovered HTTP surfaces")
         print("observations  Show canonical mission observations")
+        print("gobuster <wordlist>")
+        print("          Discover web content on the mission target")
+
 
         print("runs      Show tool runs for the active mission")
         print("hunter    Show Hunter's assessment")
@@ -339,3 +348,88 @@ class ObserverShell:
         self.show_web()
         self.show_hunter()
         self.show_runs() 
+
+
+    def run_gobuster(self, raw_command: str):
+        """
+        Deploy Gobuster against the current mission target.
+
+        Usage:
+            gobuster <wordlist>
+            gobuster <target> <wordlist>
+        """
+        parts = raw_command.split()
+
+        if len(parts) == 2:
+            target = self.context.get("host")
+            wordlist = parts[1]
+
+        elif len(parts) == 3:
+            target = parts[1]
+            wordlist = parts[2]
+
+        else:
+            print()
+            print("Usage:")
+            print("  gobuster <wordlist>")
+            print("  gobuster <target> <wordlist>")
+            print()
+            return
+
+        if not target:
+            print()
+            print("No mission target is available.")
+            print("Provide one explicitly:")
+            print("  gobuster <target> <wordlist>")
+            print()
+            return
+
+        print()
+        print("🐍 Medusa")
+        print(f"Deploying Gobuster against {target}...")
+        print()
+
+        try:
+            result = GobusterService().run(
+                target=target,
+                wordlist=wordlist,
+                status_codes_blacklist="302,404",
+                threads=10,
+            )
+        except FileNotFoundError as exc:
+            print(f"Gobuster could not be deployed: {exc}")
+            print()
+            return
+        except Exception as exc:
+            print(f"Gobuster operation failed: {exc}")
+            print()
+            return
+
+        tool_run = result["tool_run"]
+        observations = result["observations"]
+
+        self.context["gobuster_run_id"] = tool_run.id
+        self.context["gobuster_observations"] = len(observations)
+
+        print("Gobuster operation complete.")
+        print(f"Run          : {tool_run.id}")
+        print(f"Target       : {target}")
+        print(f"Observations : {len(observations)}")
+        print()
+
+        for observation in observations:
+            data = observation.data
+
+            print(data["url"])
+            print(f"  Path   : {data['path']}")
+
+            if data["status_code"] is not None:
+                print(f"  Status : {data['status_code']}")
+
+            if data["content_length"] is not None:
+                print(f"  Length : {data['content_length']}")
+
+            if data["redirect_location"]:
+                print(f"  Redirect: {data['redirect_location']}")
+
+            print()

@@ -1,3 +1,6 @@
-from core.council.council import Council
+"""
+Trident IOS Intelligence Council package.
 
-__all__ = ["Council"]
+Council components should be imported from their defining modules
+to avoid eager package initialization and circular dependencies.
+"""

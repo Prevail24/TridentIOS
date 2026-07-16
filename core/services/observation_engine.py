@@ -225,6 +225,56 @@ class ObservationEngine:
                             relationship_type="resolves_to",
                         )
                     )
+            
+
+        elif observation.category == "web_path":
+            data = observation.data
+
+            base_url = None
+            discovered_url = None
+            redirect_url = None
+
+            if data.get("base_url"):
+                base_url = self.entities.resolve(
+                    "url",
+                    data["base_url"],
+                )
+                self._remember(base_url, observation)
+                resolved.append(base_url)
+
+            if data.get("url"):
+                discovered_url = self.entities.resolve(
+                    "url",
+                    data["url"],
+                )
+                self._remember(discovered_url, observation)
+                resolved.append(discovered_url)
+
+            if base_url and discovered_url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=base_url.id,
+                        target_id=discovered_url.id,
+                        relationship_type="exposes_path",
+                    )
+                )
+
+            if data.get("redirect_location"):
+                redirect_url = self.entities.resolve(
+                    "url",
+                    data["redirect_location"],
+                )
+                self._remember(redirect_url, observation)
+                resolved.append(redirect_url)
+
+            if discovered_url and redirect_url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=discovered_url.id,
+                        target_id=redirect_url.id,
+                        relationship_type="redirects_to",
+                    )
+                )
 
         return {
             "entities": resolved,
