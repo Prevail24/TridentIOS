@@ -29,11 +29,11 @@ We gratefully acknowledge that early inspiration while continuing to build Tride
 
 ---
 
-# Designed by
+## Designed by
 
 # **Prevail**
 
-*"Signals fade. Patterns persist."*
+*"Obsessed; What the lazy call the dedicated."*
 
 ---
 
