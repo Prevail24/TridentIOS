@@ -125,7 +125,7 @@ The architecture compounds.
 # 🐍 Medusa
 
 <p align="center">
-<img src="assets/medusa_v3.png" width="100%" alt="Medusa">
+<img src="assets/medusa_greet_v1.png" width="100%" alt="Medusa">
 </p>
 
 ---
