@@ -4,23 +4,16 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class WebPathObservation:
     """
-    Native representation of discovered web content.
+    A web resource discovered through content enumeration.
 
-    Tool-neutral.
-
-    Gobuster, ffuf, feroxbuster and future
-    web discovery engines all produce this.
+    This model is tool-neutral. Gobuster, ffuf, Feroxbuster,
+    and future discovery sensors can all produce it.
     """
 
-    host: str
-
+    base_url: str
+    path: str
     url: str
 
-    path: str
-
-    status_code: int
-
+    status_code: int | None = None
     content_length: int | None = None
-
     redirect_location: str | None = None
-    
