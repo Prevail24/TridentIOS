@@ -67,8 +67,6 @@ It is an **Intelligence Operating System.**
 
 ---
 
----
-
 <p align="center">
 <img src="assets/architecture_banner_v1.png" width="100%" alt="Architecture">
 </p>
@@ -470,34 +468,62 @@ Every capability amplifies the entire platform.
 # Example Investigation
 
 ```
-Observer> investigate 10.129.244.146
+Observer> medusa strike 10.129.244.146
 
 🐍 Medusa
 Dispatching reconnaissance...
 
-👁 Sentinel
-Two new observations detected.
+---
 
 🎯 Hunter
-HTTP enumeration recommended.
-
-🐍 Gobuster
-Discovery complete.
+------
+4 investigative opportunities identified.
+Findings
+  • 1 active mission host or hosts reviewed.
+Recommendations
+  • Enumerate SSH configuration and authentication methods.
+  • Investigate the HTTP application surface.
+  • Fingerprint nginx configuration and exposed application paths.
+  • Review the detected OpenSSH version and supported authentication methods.
+Confidence: 1.00
 
 📚 Historian
-/admin has never been observed before.
+---------
+Historical context identified for 1 active mission host.
+Findings
+  • 10.129.244.146 has 39 historical observations.
+  • 10.129.244.146 was first seen at 2026-07-13 16:47:17.157157.
+  • 10.129.244.146 was last seen at 2026-07-14 03:49:58.967637.
+Confidence: 1.00
 
 ⚖ Skeptic
-Additional validation recommended.
+-------
+Mission evidence quality is strong.
+Findings
+  • 2 tool runs completed.
+  • 3 mission observations recorded.
+  • 2 open ports identified.
+  • 1 HTTP surface observations recorded.
+Recommendations
+  • Gather additional web reconnaissance before raising confidence.
+Warnings
+  • Only one HTTP endpoint observation is available.
+Confidence: 0.90
 
 🔮 Oracle
-Administrative interface is now the highest-value investigative path.
+------
+The target most likely represents a remotely administered web server.
+Findings
+  • The target likely supports remote administrative access.
+  • The target exposes a reachable web application surface.
+  • The web surface appears to be served or proxied by nginx.
+  • The coexistence of SSH and HTTP is consistent with a remotely administered Linux web server.
+  • 1 observed HTTP surface returned a redirect.
+Recommendations
+  • Prioritize targeted web application enumeration.
+  • Follow redirects and identify their destination before drawing conclusions about the application.
+Confidence: 1.00
 
-📢 Reporter
-Mission briefing updated.
-
-🐍 Medusa
-Awaiting your next command, Observer.
 ```
 
 ---
