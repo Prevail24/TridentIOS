@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITECTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Example 01: 1-Hour Quick Recon
 
 > Engagement type: rapid posture check ("how exposed is X?")

@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Coverage Analysis
 
 Honest assessment of what these skills cover vs. what real practitioners need.

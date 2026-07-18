@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Contributing to Claude-OSINT
 
 Thanks for considering a contribution. These skills are battle-tested but always improvable. Below is what's most welcome and how to submit changes.

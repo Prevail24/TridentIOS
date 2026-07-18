@@ -1,4 +1,10 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 ---
+
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
+
 name: osint-methodology
 description: "Comprehensive OSINT methodology for external red-team operations and authorized attack-surface assessments. Covers the 5-stage recon pipeline, asset-graph discipline, severity rubric, confidence upgrade workflows, time budgeting, identity-fabric mapping, breach×identity correlation, detectability tagging, detection-aware probing, WAF/CDN bypass, vulnerability prioritization, phishing infrastructure planning, bug bounty submission, and client deliverable templates. Use when planning or executing reconnaissance against authorized targets, mapping an organization's external attack surface, investigating a person/entity, or producing client deliverables."
 version: 2.2

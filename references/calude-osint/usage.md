@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Usage
 
 How to actually use these skills during an engagement.

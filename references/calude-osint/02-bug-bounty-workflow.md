@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITECTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Example 02: Bug Bounty Workflow (HackerOne)
 
 > Engagement type: HackerOne in-scope program

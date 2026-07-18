@@ -1,3 +1,5 @@
+# ### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 #!/usr/bin/env bash
 # sync-skill-content.sh — populate skills/*/SKILL.md with full v2.1 inline content
 #                        from the bundled docs/full-skills/ canonical sources.

@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Changelog
 
 All notable changes to these skills are documented here.

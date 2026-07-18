@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITECTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Example 03: Identity Fabric Mapping (Microsoft 365 Deep)
 
 > Engagement type: external red-team, identity-focused

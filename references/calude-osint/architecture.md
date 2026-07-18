@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITCTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Architecture & Design Philosophy
 
 ## The two-skill split

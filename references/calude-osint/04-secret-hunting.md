@@ -1,3 +1,5 @@
+### - NOT TRIDENT ARCHITECTURE - FROM CLAUDE OSINT REPO - TO BE USED TO HELP TRIDENT - NOT TRIDENT ARCHITECTURE
+
 # Example 04: Leaked-Credential Workflow
 
 > Engagement type: external red-team OR bug-bounty research
