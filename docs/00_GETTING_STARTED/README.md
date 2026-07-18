@@ -391,8 +391,6 @@ It is designed around the timeless process of transforming observations into tru
 
 *"Obsessed; what the lazy call the dedicated."*
 
-*"Building Platforms not Features."*
-
 ---
 
 > **Observe.**
