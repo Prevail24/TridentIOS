@@ -14,3 +14,7 @@ for serpent in web.serpents():
     for capability in serpent.capabilities():
 
         capability.awaken()
+
+        for weapon in capability.weapons():
+
+            weapon.awaken()

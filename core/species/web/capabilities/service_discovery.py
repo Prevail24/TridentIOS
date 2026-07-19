@@ -1,13 +1,19 @@
 from core.capabilities.capability import Capability
+from core.species.web.weapons import NmapWeapon
 
 
 class ServiceDiscoveryCapability(Capability):
-    """
-    Discovers exposed network services.
-    """
 
     name = "Service Discovery"
 
     description = (
-        "Discovers exposed network services."
+        "Discover exposed network services."
     )
+
+    def __init__(self):
+        self._weapons = [
+            NmapWeapon(),
+        ]
+
+    def weapons(self):
+        return list(self._weapons)
