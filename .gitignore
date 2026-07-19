@@ -59,6 +59,9 @@ node_modules/
 .npm/
 .pnpm-store/
 
+# Operator-managed wordlists
+/libraries/wordlists/
+
 # Local sync artifacts
 *.local.md
 *.synced

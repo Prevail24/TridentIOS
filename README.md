@@ -14,7 +14,8 @@
 > **An Intelligence Operating System**
 >
 > *Standardizing how missions are executed, intelligence is represented, and specialist capabilities collaborate.*
-
+>
+> *The goal is not to run every tool. The goal is to reduce uncertainty.*
 ---
 
 # Vision

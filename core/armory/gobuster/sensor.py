@@ -1,5 +1,5 @@
 from core.armory.sensor import Sensor
-from core.armory.gobuster.adapter import GobusterAdapter
+from core.adapters.gobuster_adapter import GobusterAdapter
 from core.parsers.gobuster.parser import GobusterParser
 
 

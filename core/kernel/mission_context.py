@@ -3,6 +3,9 @@ from core.repositories.tool_run_repository import ToolRunRepository
 from core.services.state_service import StateService
 from core.models.observation import Observation
 from core.repositories.observation_repository import ObservationRepository
+from core.models.mission import Mission
+from core.services.mission_service import MissionService
+
 
 class MissionContext:
     """
@@ -14,6 +17,7 @@ class MissionContext:
 
     def __init__(self):
         self.state = StateService()
+        self.missions = MissionService()
         self.tool_runs = ToolRunRepository()
         self.observations = ObservationRepository()
 
@@ -162,3 +166,23 @@ class MissionContext:
             surfaces,
             key=lambda item: str(item["url"]),
         )
+
+    def current_mission(self) -> Mission:
+        """
+        Return the active Mission.
+        """
+        mission_id = self.require_mission_id()
+        return self.missions.open(mission_id)
+
+    def target(self) -> str:
+        """
+        Return the active mission scope as the operational target.
+        """
+        target = self.current_mission().scope.strip()
+
+        if not target:
+            raise RuntimeError(
+                "The active mission has no operational target."
+            )
+
+        return target

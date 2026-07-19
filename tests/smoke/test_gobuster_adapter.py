@@ -1,54 +1,59 @@
-from unittest.mock import patch
+from types import SimpleNamespace
 
-from core.armory.gobuster.adapter import GobusterAdapter
+from core.adapters.gobuster_adapter import GobusterAdapter
+from core.config import Config
 
 
-adapter = GobusterAdapter(
-    target="http://orion.htb",
-    wordlist="/tmp/wordlist.txt",
-    status_codes_blacklist="302,404",
-    threads=5,
-)
+def test_gobuster_adapter_executes_observation_pipeline(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(Config, "KNOWLEDGE_DIR", tmp_path / "knowledge")
 
-with patch(
-    "core.armory.gobuster.adapter.subprocess.run"
-) as mocked_run:
-    mocked_run.return_value.stdout = (
-        "index.php (Status: 200) [Size: 12272]\n"
+    wordlist = tmp_path / "wordlist.txt"
+    wordlist.write_text("index.php\n", encoding="utf-8")
+    captured = {}
+
+    def run_gobuster(command, **options):
+        captured["command"] = command
+        captured["options"] = options
+        return SimpleNamespace(
+            stdout="index.php (Status: 200) [Size: 12272]\n"
+        )
+
+    monkeypatch.setattr(
+        "core.adapters.gobuster_adapter.subprocess.run",
+        run_gobuster,
     )
 
-    output = adapter.execute()
+    result = GobusterAdapter(
+        target="http://orion.htb",
+        wordlist=str(wordlist),
+        status_codes_blacklist="302,404",
+        threads=5,
+    ).execute()
 
-mocked_run.assert_called_once()
-
-command = mocked_run.call_args.args[0]
-options = mocked_run.call_args.kwargs
-
-assert command == [
-    "gobuster",
-    "dir",
-    "--url",
-    "http://orion.htb",
-    "--wordlist",
-    "/tmp/wordlist.txt",
-    "--threads",
-    "5",
-    "--status-codes-blacklist",
-    "302,404",
-    "--quiet",
-    "--no-color",
-    "--no-progress",
-]
-
-assert options == {
-    "check": True,
-    "capture_output": True,
-    "text": True,
-}
-
-assert output == "index.php (Status: 200) [Size: 12272]\n"
-
-print()
-print("Gobuster Adapter")
-print("-----------------")
-print("Command construction: PASS")
+    assert captured["command"] == [
+        "gobuster",
+        "dir",
+        "--url",
+        "http://orion.htb",
+        "--wordlist",
+        str(wordlist),
+        "--threads",
+        "5",
+        "--status-codes-blacklist",
+        "302,404",
+        "--quiet",
+        "--no-color",
+        "--no-progress",
+    ]
+    assert captured["options"] == {
+        "check": True,
+        "capture_output": True,
+        "text": True,
+    }
+    assert result["tool_run"].tool == "gobuster"
+    assert result["observations"][0].data["path"] == "index.php"
+    assert len(result["processed"]) == 1

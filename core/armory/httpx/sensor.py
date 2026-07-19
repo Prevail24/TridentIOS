@@ -1,5 +1,5 @@
 from core.armory.sensor import Sensor
-from core.armory.httpx.adapter import HttpxAdapter
+from core.adapters.httpx_adapter import HttpxAdapter
 
 
 class HttpxSensor(Sensor):
