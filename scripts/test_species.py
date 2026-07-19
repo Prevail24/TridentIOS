@@ -1,15 +1,16 @@
 from core.species.registry import SpeciesRegistry
 
 
-def main() -> None:
-    registry = SpeciesRegistry()
-    web = registry.get("web")
+registry = SpeciesRegistry()
 
-    web.awaken()
+web = registry.get("web")
 
-    for serpent in web.serpents():
-        serpent.awaken()
+web.awaken()
 
+for serpent in web.serpents():
 
-if __name__ == "__main__":
-    main()
+    serpent.awaken()
+
+    for capability in serpent.capabilities():
+
+        capability.awaken()

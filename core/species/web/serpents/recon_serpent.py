@@ -1,16 +1,21 @@
 from core.serpents import Serpent
+from core.species.web.capabilities import (
+    ServiceDiscoveryCapability,
+)
 
 
 class ReconSerpent(Serpent):
-    """
-    The reconnaissance specialist of the Web Species.
-
-    Recon Serpent establishes initial visibility of a target
-    before deeper enumeration or analysis begins.
-    """
 
     name = "Recon"
 
     description = (
-        "Discovers and profiles web-facing infrastructure."
+        "Discovers web-facing infrastructure."
     )
+
+    def __init__(self):
+        self._capabilities = [
+            ServiceDiscoveryCapability(),
+        ]
+
+    def capabilities(self):
+        return list(self._capabilities)

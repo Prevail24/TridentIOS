@@ -3,17 +3,21 @@ from abc import ABC
 
 class Capability(ABC):
     """
-    A Capability represents something Trident knows how to do.
+    Base contract for every Trident Capability.
 
-    Examples:
+    A Capability represents something a Serpent knows
+    how to perform.
 
-    • Service Discovery
-    • JWT Analysis
-    • Directory Enumeration
+    Capabilities choose Weapons.
+
+    Capabilities never execute tools directly.
     """
 
-    name = ""
-    description = ""
+    name: str = ""
+    description: str = ""
 
-    def weapons(self):
+    def weapons(self) -> list:
         return []
+
+    def awaken(self):
+        print(f"🧠 {self.name} Capability awakened.")
