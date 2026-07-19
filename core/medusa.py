@@ -23,38 +23,3 @@ from core.serpents.reporter import Reporter
 from core.command.medusa import Medusa
 
 __all__ = ["Medusa"]
-
-
-class Medusa:
-    """
-    Chief of Operations for Trident IOS.
-
-    Medusa coordinates operational systems.
-    She does not perform specialist analysis herself.
-    """
-
-    def __init__(
-        self,
-        council: Council | None = None,
-        reporter: Reporter | None = None,
-    ) -> None:
-        self.council = council or Council()
-        self.reporter = reporter or Reporter()
-
-    def brief(
-        self,
-        context: MissionContext | None = None,
-    ) -> MissionBrief:
-        """
-        Convene the Council and return an operational briefing
-        for the active mission.
-        """
-        mission_context = context or MissionContext()
-
-        session = self.council.deliberate(
-            mission_context
-        )
-
-        return self.reporter.brief(
-            session
-        )
