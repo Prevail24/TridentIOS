@@ -28,13 +28,7 @@ class GobusterWeapon(Weapon):
                 "Gobuster requires an operator-selected wordlist."
             )
 
-        targets = list(
-            dict.fromkeys(
-                str(surface["url"])
-                for surface in context.web_surfaces()
-                if surface.get("url")
-            )
-        )
+        targets = self._targets(context)
 
         if not targets:
             raise RuntimeError(
@@ -45,10 +39,47 @@ class GobusterWeapon(Weapon):
 
         return [
             GobusterSensor(
-                target=target,
+                target=target["url"],
                 wordlist=self.wordlist,
+                host_header=target["host_header"],
                 status_codes_blacklist=self.status_codes_blacklist,
                 threads=self.threads,
             ).collect()
             for target in targets
         ]
+
+    def _targets(self, context: MissionContext) -> list[dict]:
+        targets = []
+        seen = set()
+
+        for surface in context.web_surfaces():
+            if self._is_redirect_only(surface):
+                continue
+
+            url = surface.get("probe_url") or surface.get("url")
+
+            if not url:
+                continue
+
+            target = {
+                "url": str(url),
+                "host_header": surface.get("host_header"),
+            }
+            key = (target["url"], target["host_header"])
+
+            if key in seen:
+                continue
+
+            seen.add(key)
+            targets.append(target)
+
+        return targets
+
+    def _is_redirect_only(self, surface: dict) -> bool:
+        status_code = surface.get("status_code")
+
+        return (
+            status_code in {301, 302, 303, 307, 308}
+            and surface.get("redirect_location")
+            and not surface.get("host_header")
+        )

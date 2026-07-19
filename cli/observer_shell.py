@@ -297,8 +297,20 @@ class ObserverShell:
             for surface in surfaces:
                 print(surface["url"])
 
+                if surface["host_header"]:
+                    print(f"  Host Header  : {surface['host_header']}")
+
+                if surface["probe_url"]:
+                    print(f"  Probe URL    : {surface['probe_url']}")
+
                 if surface["status_code"] is not None:
                     print(f"  Status       : {surface['status_code']}")
+
+                if surface["redirect_location"]:
+                    print(
+                        "  Redirect     : "
+                        f"{surface['redirect_location']}"
+                    )
 
                 if surface["title"]:
                     print(f"  Title        : {surface['title']}")

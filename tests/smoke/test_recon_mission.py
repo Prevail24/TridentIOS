@@ -97,7 +97,8 @@ def test_recon_mission_produces_operational_brief(
         assert check is True
         assert capture_output is True
         assert text is True
-        assert command[:3] == ["httpx", "-u", "192.0.2.10"]
+        assert command[:3] == ["httpx", "-u", "http://192.0.2.10"]
+        assert "-location" in command
 
         return SimpleNamespace(
             stdout=json.dumps(

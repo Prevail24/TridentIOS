@@ -1,5 +1,6 @@
 import json
 import subprocess
+from urllib.parse import urlparse, urlunparse
 
 from core.adapters.base import ToolAdapter
 from core.engine import TridentEngine
@@ -15,8 +16,14 @@ class HttpxAdapter(ToolAdapter):
     Execute HTTPX and record its output as mission intelligence.
     """
 
-    def __init__(self, target: str):
+    def __init__(
+        self,
+        target: str,
+        *,
+        host_header: str | None = None,
+    ):
         self.target = target
+        self.host_header = host_header
         self.engine = TridentEngine()
         self.parser = HttpxJsonParser()
         self.translator = HttpxObservationTranslator()
@@ -39,9 +46,13 @@ class HttpxAdapter(ToolAdapter):
             "-silent",
             "-title",
             "-status-code",
+            "-location",
             "-tech-detect",
             "-server",
         ]
+
+        if self.host_header:
+            command.extend(["-H", f"Host: {self.host_header}"])
 
         result = subprocess.run(
             command,
@@ -55,6 +66,10 @@ class HttpxAdapter(ToolAdapter):
             for raw_line in result.stdout.splitlines()
             if (line := raw_line.strip())
         ]
+
+        for record in records:
+            self._annotate_record(record)
+
         native_observations = self.parser.parse(records)
         observations = self.translator.translate(
             native_observations,
@@ -78,3 +93,34 @@ class HttpxAdapter(ToolAdapter):
             "observations": observations,
             "processed": processed,
         }
+
+    def _annotate_record(self, record: dict) -> None:
+        record.setdefault("probe_url", record.get("url") or self.target)
+
+        if not self.host_header:
+            return
+
+        record["host_header"] = self.host_header
+        record["host"] = self.host_header
+
+        parsed = urlparse(record.get("url") or self.target)
+        if not parsed.scheme:
+            return
+
+        port = record.get("port")
+        netloc = self.host_header
+
+        if port:
+            try:
+                port_number = int(port)
+            except (TypeError, ValueError):
+                port_number = None
+
+            if (
+                port_number
+                and (parsed.scheme, port_number)
+                not in {("http", 80), ("https", 443)}
+            ):
+                netloc = f"{self.host_header}:{port_number}"
+
+        record["url"] = urlunparse(parsed._replace(netloc=netloc))

@@ -20,15 +20,18 @@ class GobusterSensor(Sensor):
         target: str,
         wordlist: str,
         *,
+        host_header: str | None = None,
         status_codes_blacklist: str = "302,404",
         threads: int = 10,
     ):
         self.target = target
         self.wordlist = wordlist
+        self.host_header = host_header
 
         self.adapter = GobusterAdapter(
             target=target,
             wordlist=wordlist,
+            host_header=host_header,
             status_codes_blacklist=status_codes_blacklist,
             threads=threads,
         )

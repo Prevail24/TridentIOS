@@ -6,9 +6,12 @@ class HttpxObservation:
     url: str
     host: str
     host_ip: str | None
+    host_header: str | None
+    probe_url: str | None
     port: int | None
     scheme: str | None
     status_code: int | None
+    redirect_location: str | None
     title: str | None
     webserver: str | None
     content_type: str | None

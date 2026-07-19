@@ -19,11 +19,13 @@ class GobusterAdapter(ToolAdapter):
         target: str,
         wordlist: str,
         *,
+        host_header: str | None = None,
         status_codes_blacklist: str = "302,404",
         threads: int = 10,
     ):
         self.target = target
         self.wordlist = wordlist
+        self.host_header = host_header
         self.status_codes_blacklist = status_codes_blacklist
         self.threads = threads
         self.engine = TridentEngine()
@@ -55,6 +57,9 @@ class GobusterAdapter(ToolAdapter):
             "--no-color",
             "--no-progress",
         ]
+
+        if self.host_header:
+            command.extend(["--headers", f"Host: {self.host_header}"])
 
         result = subprocess.run(
             command,
