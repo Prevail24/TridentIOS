@@ -276,6 +276,73 @@ class ObservationEngine:
                     )
                 )
 
+        elif observation.category == "web_vhost":
+            data = observation.data
+
+            base_url = None
+            host = None
+            vhost_url = None
+            redirect_url = None
+
+            if data.get("base_url"):
+                base_url = self.entities.resolve(
+                    "url",
+                    data["base_url"],
+                )
+                self._remember(base_url, observation)
+                resolved.append(base_url)
+
+            if data.get("hostname"):
+                host = self.entities.resolve(
+                    "host",
+                    data["hostname"],
+                )
+                self._remember(host, observation)
+                resolved.append(host)
+
+            if data.get("url"):
+                vhost_url = self.entities.resolve(
+                    "url",
+                    data["url"],
+                )
+                self._remember(vhost_url, observation)
+                resolved.append(vhost_url)
+
+            if base_url and host:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=base_url.id,
+                        target_id=host.id,
+                        relationship_type="reveals_vhost",
+                    )
+                )
+
+            if host and vhost_url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=host.id,
+                        target_id=vhost_url.id,
+                        relationship_type="serves_url",
+                    )
+                )
+
+            if data.get("redirect_location"):
+                redirect_url = self.entities.resolve(
+                    "url",
+                    data["redirect_location"],
+                )
+                self._remember(redirect_url, observation)
+                resolved.append(redirect_url)
+
+            if vhost_url and redirect_url:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=vhost_url.id,
+                        target_id=redirect_url.id,
+                        relationship_type="redirects_to",
+                    )
+                )
+
         elif observation.category == "http_artifact":
             data = observation.data
 

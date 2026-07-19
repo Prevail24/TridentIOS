@@ -4,6 +4,7 @@ from core.species.web.capabilities import (
     ContentDiscoveryCapability,
     ServiceDiscoveryCapability,
     TechnologyDiscoveryCapability,
+    VirtualHostDiscoveryCapability,
 )
 
 
@@ -18,6 +19,9 @@ class ReconSerpent(Serpent):
     def __init__(
         self,
         gobuster_wordlist: str | None = None,
+        vhost_target: str | None = None,
+        vhost_domain: str | None = None,
+        vhost_wordlist: str | None = None,
         artifact_url: str | None = None,
         artifact_host_header: str | None = None,
     ):
@@ -26,6 +30,11 @@ class ReconSerpent(Serpent):
             TechnologyDiscoveryCapability(),
             ContentDiscoveryCapability(
                 wordlist=gobuster_wordlist,
+            ),
+            VirtualHostDiscoveryCapability(
+                target=vhost_target,
+                domain=vhost_domain,
+                wordlist=vhost_wordlist,
             ),
             ArtifactRetrievalCapability(
                 url=artifact_url,

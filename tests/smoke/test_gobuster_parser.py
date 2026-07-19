@@ -1,4 +1,5 @@
 from core.models.web_path_observation import WebPathObservation
+from core.models.web_vhost_observation import WebVhostObservation
 from core.parsers.gobuster.parser import GobusterParser
 
 
@@ -29,3 +30,26 @@ index.php   (Status: 200) [Size: 12272]
     assert observations[1].status_code == 200
     assert observations[2].path == ".git"
     assert observations[2].status_code == 403
+
+
+def test_gobuster_parser_returns_vhost_observations():
+    raw_output = """
+research.bedside.htb Status: 200 [Size: 3152]
+mail.bedside.htb Status: 301 [Size: 349] [--> http://bedside.htb/]
+""".strip()
+
+    observations = GobusterParser().parse_vhosts(
+        raw_output,
+        base_url="http://10.129.36.93",
+    )
+
+    assert len(observations) == 2
+    assert all(
+        isinstance(observation, WebVhostObservation)
+        for observation in observations
+    )
+    assert observations[0].hostname == "research.bedside.htb"
+    assert observations[0].url == "http://research.bedside.htb"
+    assert observations[0].status_code == 200
+    assert observations[0].content_length == 3152
+    assert observations[1].redirect_location == "http://bedside.htb/"

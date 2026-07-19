@@ -3,9 +3,11 @@ from types import SimpleNamespace
 import pytest
 
 import core.services.gobuster_service as gobuster_service_module
+import core.species.web.weapons.gobuster_vhost_weapon as vhost_weapon_module
 import core.species.web.weapons.gobuster_weapon as gobuster_weapon_module
 from core.services.gobuster_service import GobusterService
-from core.species.web.weapons import GobusterWeapon
+from core.species.web.capabilities import VirtualHostDiscoveryCapability
+from core.species.web.weapons import GobusterVhostWeapon, GobusterWeapon
 
 
 def test_gobuster_weapon_requires_operator_wordlist():
@@ -15,11 +17,84 @@ def test_gobuster_weapon_requires_operator_wordlist():
         GobusterWeapon().execute(context)
 
 
+def test_gobuster_vhost_weapon_requires_operator_inputs():
+    context = SimpleNamespace()
+
+    with pytest.raises(RuntimeError, match="target"):
+        GobusterVhostWeapon(
+            domain="bedside.htb",
+            wordlist="wordlist.txt",
+        ).execute(context)
+
+    with pytest.raises(RuntimeError, match="domain"):
+        GobusterVhostWeapon(
+            target="http://10.129.36.93",
+            wordlist="wordlist.txt",
+        ).execute(context)
+
+    with pytest.raises(RuntimeError, match="wordlist"):
+        GobusterVhostWeapon(
+            target="http://10.129.36.93",
+            domain="bedside.htb",
+        ).execute(context)
+
+
 def test_gobuster_weapon_requires_observed_http_surface():
     context = SimpleNamespace(web_surfaces=lambda: [])
 
     with pytest.raises(RuntimeError, match="observed HTTP surface"):
         GobusterWeapon(wordlist="wordlist.txt").execute(context)
+
+
+def test_gobuster_vhost_weapon_executes_sensor(monkeypatch):
+    collected = []
+
+    class StubGobusterSensor:
+        def __init__(self, **arguments):
+            collected.append(arguments)
+
+        def collect(self):
+            return {"ok": True}
+
+    monkeypatch.setattr(
+        vhost_weapon_module,
+        "GobusterSensor",
+        StubGobusterSensor,
+    )
+
+    result = GobusterVhostWeapon(
+        target="http://10.129.36.93",
+        domain="bedside.htb",
+        wordlist="wordlist.txt",
+        exclude_status="301",
+        threads=30,
+    ).execute(SimpleNamespace())
+
+    assert result == {"ok": True}
+    assert collected == [
+        {
+            "target": "http://10.129.36.93",
+            "wordlist": "wordlist.txt",
+            "mode": "vhost",
+            "domain": "bedside.htb",
+            "append_domain": True,
+            "exclude_status": "301",
+            "threads": 30,
+        }
+    ]
+
+
+def test_virtual_host_discovery_capability_owns_vhost_weapon():
+    capability = VirtualHostDiscoveryCapability(
+        target="http://10.129.36.93",
+        domain="bedside.htb",
+        wordlist="wordlist.txt",
+    )
+
+    weapons = capability.weapons()
+
+    assert len(weapons) == 1
+    assert isinstance(weapons[0], GobusterVhostWeapon)
 
 
 def test_gobuster_weapon_scans_each_unique_http_surface(monkeypatch):
@@ -62,6 +137,7 @@ def test_gobuster_weapon_scans_each_unique_http_surface(monkeypatch):
             "wordlist.txt",
             {
                 "host_header": None,
+                "extensions": None,
                 "status_codes_blacklist": "302,404",
                 "threads": 7,
             },
@@ -71,6 +147,7 @@ def test_gobuster_weapon_scans_each_unique_http_surface(monkeypatch):
             "wordlist.txt",
             {
                 "host_header": None,
+                "extensions": None,
                 "status_codes_blacklist": "302,404",
                 "threads": 7,
             },
@@ -121,6 +198,7 @@ def test_gobuster_weapon_uses_probe_url_and_host_header(monkeypatch):
             "wordlist.txt",
             {
                 "host_header": "paperwork.htb",
+                "extensions": None,
                 "status_codes_blacklist": "302,404",
                 "threads": 10,
             },
@@ -140,8 +218,13 @@ def test_gobuster_service_preserves_cli_compatibility(monkeypatch):
             assert arguments == {
                 "target": "https://example.test",
                 "wordlist": "wordlist.txt",
+                "mode": "dir",
                 "host_header": None,
+                "extensions": None,
+                "domain": None,
+                "append_domain": True,
                 "status_codes_blacklist": "302,404",
+                "exclude_status": None,
                 "threads": 10,
             }
 

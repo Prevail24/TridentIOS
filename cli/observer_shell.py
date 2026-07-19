@@ -1,7 +1,14 @@
+import shlex
+
+from cli.commands.http_artifact import (
+    build_upload_url,
+    fetch_http_artifact,
+    fetch_uploaded_artifact,
+    print_http_artifact_result,
+)
 from cli.observer_dashboard import ObserverDashboard
 from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
-from core.services.http_download_service import HttpDownloadService
 
 
 class ObserverShell:
@@ -53,11 +60,20 @@ class ObserverShell:
             elif command == "runs":
                 self.show_runs()
 
+            elif command == "vhosts":
+                self.show_vhosts()
+
             elif command.startswith("gobuster"):
                 self.run_gobuster(raw_command)
 
+            elif command.startswith("vhost"):
+                self.run_vhost(raw_command)
+
             elif command.startswith("download"):
                 self.run_download(raw_command)
+
+            elif command.startswith("fetch-upload"):
+                self.run_fetch_upload(raw_command)
             
             elif command == "observations":
                 self.show_observations()
@@ -91,11 +107,18 @@ class ObserverShell:
         print("ports     Show open ports for the active mission")
         print("services  Show discovered network services")
         print("web       Show discovered HTTP surfaces")
+        print("vhosts    Show discovered virtual hosts")
         print("observations  Show canonical mission observations")
         print("gobuster <wordlist>")
         print("          Discover web content on the mission target")
+        print("gobuster <target> <wordlist> [--host <host>] [--extensions <exts>]")
+        print("          Discover web content with optional Host header/extensions")
+        print("vhost <target> <domain> <wordlist> [--exclude-status <codes>]")
+        print("          Discover virtual hosts for a domain")
         print("download <url>")
         print("          Retrieve an HTTP artifact into mission evidence")
+        print("fetch-upload <base-url> <filename> [--host <host>]")
+        print("          Retrieve a known file from /uploads into mission evidence")
 
 
         print("runs      Show tool runs for the active mission")
@@ -186,7 +209,7 @@ class ObserverShell:
         print()
 
         try:
-            result = HttpDownloadService().run(
+            result = fetch_http_artifact(
                 url,
                 host_header=host_header,
             )
@@ -195,6 +218,68 @@ class ObserverShell:
             print()
             return
 
+        self.record_http_artifact_result(result)
+        print_http_artifact_result(result)
+
+    def run_fetch_upload(self, raw_command: str):
+        """
+        Retrieve a known uploaded file and attach it to the active mission.
+
+        Usage:
+            fetch-upload <base-url> <filename>
+            fetch-upload <base-url> <filename> --host <host-header>
+        """
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            print(f"Could not parse command: {exc}")
+            print()
+            return
+
+        host_header = None
+
+        if "--host" in parts:
+            host_index = parts.index("--host")
+
+            if host_index + 1 >= len(parts):
+                print("Usage: fetch-upload <base-url> <filename> --host <host-header>")
+                print()
+                return
+
+            host_header = parts[host_index + 1]
+            del parts[host_index : host_index + 2]
+
+        if len(parts) != 3:
+            print()
+            print("Usage:")
+            print("  fetch-upload <base-url> <filename>")
+            print("  fetch-upload <base-url> <filename> --host <host-header>")
+            print()
+            return
+
+        _, base_url, filename = parts
+        url = build_upload_url(base_url, filename)
+
+        print()
+        print("Medusa")
+        print(f"Retrieving uploaded artifact from {url}...")
+        print()
+
+        try:
+            result = fetch_uploaded_artifact(
+                base_url,
+                filename,
+                host_header=host_header,
+            )
+        except Exception as exc:
+            print(f"Uploaded artifact retrieval failed: {exc}")
+            print()
+            return
+
+        self.record_http_artifact_result(result)
+        print_http_artifact_result(result)
+
+    def record_http_artifact_result(self, result: dict):
         tool_run = result["tool_run"]
         observations = result["observations"]
 
@@ -203,24 +288,6 @@ class ObserverShell:
             self.context.get("http_artifacts", 0)
             + len(observations)
         )
-
-        print("Artifact retrieval complete.")
-        print(f"Run          : {tool_run.id}")
-        print(f"Observations : {len(observations)}")
-
-        for observation in observations:
-            data = observation.data
-
-            print()
-            print(data["filename"])
-            print(f"  Evidence : {data['evidence_path']}")
-            print(f"  SHA256   : {data['sha256']}")
-            print(f"  Size     : {data['size']}")
-
-            if data["content_type"]:
-                print(f"  Type     : {data['content_type']}")
-
-        print()
 
     def show_ports(self):
         print()
@@ -413,6 +480,45 @@ class ObserverShell:
 
                 print()   
 
+    def show_vhosts(self):
+            print()
+            print("══════════════════════════════════════")
+            print("          VIRTUAL HOSTS")
+            print("══════════════════════════════════════")
+            print()
+
+            try:
+                vhosts = self.mission_context.web_vhosts()
+            except RuntimeError as exc:
+                print(str(exc))
+                print()
+                return
+
+            if not vhosts:
+                print("No virtual hosts recorded for the active mission.")
+                print()
+                return
+
+            for vhost in vhosts:
+                print(vhost["hostname"])
+
+                if vhost["url"]:
+                    print(f"  URL      : {vhost['url']}")
+
+                if vhost["base_url"]:
+                    print(f"  Found Via: {vhost['base_url']}")
+
+                if vhost["status_code"] is not None:
+                    print(f"  Status   : {vhost['status_code']}")
+
+                if vhost["content_length"] is not None:
+                    print(f"  Length   : {vhost['content_length']}")
+
+                if vhost["redirect_location"]:
+                    print(f"  Redirect : {vhost['redirect_location']}")
+
+                print()
+
     def show_all(self):
         print()
         print("══════════════════════════════════════")
@@ -432,6 +538,7 @@ class ObserverShell:
         self.show_ports()
         self.show_services()
         self.show_web()
+        self.show_vhosts()
         self.show_hunter()
         self.show_runs() 
 
@@ -443,22 +550,49 @@ class ObserverShell:
         Usage:
             gobuster <wordlist>
             gobuster <target> <wordlist>
+            gobuster <target> <wordlist> --host <host-header>
+            gobuster <target> <wordlist> --extensions php,txt,bak
         """
-        parts = raw_command.split()
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            print()
+            print(f"Unable to parse command: {exc}")
+            print()
+            return
 
-        if len(parts) == 2:
+        try:
+            positionals, options = self._parse_options(
+                parts[1:],
+                value_options={
+                    "--host",
+                    "--extensions",
+                    "-x",
+                    "--blacklist",
+                    "--threads",
+                },
+            )
+        except ValueError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        if len(positionals) == 1:
             target = self.context.get("host")
-            wordlist = parts[1]
+            wordlist = positionals[0]
 
-        elif len(parts) == 3:
-            target = parts[1]
-            wordlist = parts[2]
+        elif len(positionals) == 2:
+            target = positionals[0]
+            wordlist = positionals[1]
 
         else:
             print()
             print("Usage:")
             print("  gobuster <wordlist>")
             print("  gobuster <target> <wordlist>")
+            print("  gobuster <target> <wordlist> --host <host-header>")
+            print("  gobuster <target> <wordlist> --extensions php,txt,bak")
             print()
             return
 
@@ -475,12 +609,25 @@ class ObserverShell:
         print(f"Deploying Gobuster against {target}...")
         print()
 
+        host_header = options.get("--host")
+        extensions = options.get("--extensions") or options.get("-x")
+        status_codes_blacklist = options.get("--blacklist", "302,404")
+
+        try:
+            threads = int(options.get("--threads", "10"))
+        except ValueError:
+            print("--threads must be an integer.")
+            print()
+            return
+
         try:
             result = GobusterService().run(
                 target=target,
                 wordlist=wordlist,
-                status_codes_blacklist="302,404",
-                threads=10,
+                host_header=host_header,
+                extensions=extensions,
+                status_codes_blacklist=status_codes_blacklist,
+                threads=threads,
             )
         except FileNotFoundError as exc:
             print(f"Gobuster could not be deployed: {exc}")
@@ -519,3 +666,133 @@ class ObserverShell:
                 print(f"  Redirect: {data['redirect_location']}")
 
             print()
+
+    def run_vhost(self, raw_command: str):
+        """
+        Discover virtual hosts for a domain.
+
+        Usage:
+            vhost <target> <domain> <wordlist>
+            vhost <target> <domain> <wordlist> --exclude-status 301
+        """
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            print()
+            print(f"Unable to parse command: {exc}")
+            print()
+            return
+
+        try:
+            positionals, options = self._parse_options(
+                parts[1:],
+                value_options={
+                    "--exclude-status",
+                    "--threads",
+                },
+            )
+        except ValueError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        if len(positionals) != 3:
+            print()
+            print("Usage:")
+            print("  vhost <target> <domain> <wordlist>")
+            print("  vhost <target> <domain> <wordlist> --exclude-status 301")
+            print()
+            return
+
+        target, domain, wordlist = positionals
+        exclude_status = options.get("--exclude-status")
+
+        try:
+            threads = int(options.get("--threads", "10"))
+        except ValueError:
+            print("--threads must be an integer.")
+            print()
+            return
+
+        print()
+        print("🐍 Medusa")
+        print(f"Discovering virtual hosts for {domain} via {target}...")
+        print()
+
+        try:
+            result = GobusterService().run(
+                target=target,
+                wordlist=wordlist,
+                mode="vhost",
+                domain=domain,
+                append_domain=True,
+                exclude_status=exclude_status,
+                threads=threads,
+            )
+        except FileNotFoundError as exc:
+            print(f"Gobuster vhost could not be deployed: {exc}")
+            print()
+            return
+        except Exception as exc:
+            print(f"Gobuster vhost operation failed: {exc}")
+            print()
+            return
+
+        tool_run = result["tool_run"]
+        observations = result["observations"]
+
+        self.context["vhost_run_id"] = tool_run.id
+        self.context["vhost_observations"] = len(observations)
+
+        print("Virtual host discovery complete.")
+        print(f"Run          : {tool_run.id}")
+        print(f"Target       : {target}")
+        print(f"Domain       : {domain}")
+        print(f"Observations : {len(observations)}")
+        print()
+
+        for observation in observations:
+            data = observation.data
+
+            print(data["hostname"])
+
+            if data["status_code"] is not None:
+                print(f"  Status : {data['status_code']}")
+
+            if data["content_length"] is not None:
+                print(f"  Length : {data['content_length']}")
+
+            if data["redirect_location"]:
+                print(f"  Redirect: {data['redirect_location']}")
+
+            print()
+
+    def _parse_options(
+        self,
+        tokens: list[str],
+        *,
+        value_options: set[str],
+    ) -> tuple[list[str], dict[str, str]]:
+        positionals = []
+        options = {}
+        index = 0
+
+        while index < len(tokens):
+            token = tokens[index]
+
+            if token in value_options:
+                if index + 1 >= len(tokens):
+                    raise ValueError(f"{token} requires a value.")
+
+                options[token] = tokens[index + 1]
+                index += 2
+                continue
+
+            if token.startswith("--") or token.startswith("-"):
+                raise ValueError(f"Unknown option: {token}")
+
+            positionals.append(token)
+            index += 1
+
+        return positionals, options

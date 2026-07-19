@@ -15,10 +15,12 @@ class GobusterWeapon(Weapon):
         self,
         wordlist: str | None = None,
         *,
+        extensions: str | None = None,
         status_codes_blacklist: str = "302,404",
         threads: int = 10,
     ):
         self.wordlist = wordlist
+        self.extensions = extensions
         self.status_codes_blacklist = status_codes_blacklist
         self.threads = threads
 
@@ -42,6 +44,7 @@ class GobusterWeapon(Weapon):
                 target=target["url"],
                 wordlist=self.wordlist,
                 host_header=target["host_header"],
+                extensions=self.extensions,
                 status_codes_blacklist=self.status_codes_blacklist,
                 threads=self.threads,
             ).collect()

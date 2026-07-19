@@ -170,6 +170,35 @@ class MissionContext:
             key=lambda item: str(item["url"]),
         )
 
+    def web_vhosts(self) -> list[dict]:
+        """
+        Return virtual host intelligence for the active mission.
+        """
+        vhosts = []
+
+        for observation in self.mission_observations():
+            if observation.category != "web_vhost":
+                continue
+
+            data = observation.data or {}
+
+            vhosts.append(
+                {
+                    "hostname": data.get("hostname", "Unknown"),
+                    "url": data.get("url"),
+                    "base_url": data.get("base_url"),
+                    "status_code": data.get("status_code"),
+                    "content_length": data.get("content_length"),
+                    "redirect_location": data.get("redirect_location"),
+                    "observation_id": observation.id,
+                }
+            )
+
+        return sorted(
+            vhosts,
+            key=lambda item: str(item["hostname"]),
+        )
+
     def current_mission(self) -> Mission:
         """
         Return the active Mission.
