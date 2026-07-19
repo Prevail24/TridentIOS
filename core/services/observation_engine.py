@@ -276,6 +276,55 @@ class ObservationEngine:
                     )
                 )
 
+        elif observation.category == "http_artifact":
+            data = observation.data
+
+            source_url = None
+            artifact = None
+            hash_entity = None
+
+            if data.get("source_url"):
+                source_url = self.entities.resolve(
+                    "url",
+                    data["source_url"],
+                )
+                self._remember(source_url, observation)
+                resolved.append(source_url)
+
+            if data.get("filename"):
+                artifact = self.entities.resolve(
+                    "artifact",
+                    data["filename"],
+                )
+                self._remember(artifact, observation)
+                resolved.append(artifact)
+
+            if data.get("sha256"):
+                hash_entity = self.entities.resolve(
+                    "sha256",
+                    data["sha256"],
+                )
+                self._remember(hash_entity, observation)
+                resolved.append(hash_entity)
+
+            if source_url and artifact:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=source_url.id,
+                        target_id=artifact.id,
+                        relationship_type="served_artifact",
+                    )
+                )
+
+            if artifact and hash_entity:
+                relationships.append(
+                    self.relationships.create(
+                        source_id=artifact.id,
+                        target_id=hash_entity.id,
+                        relationship_type="has_hash",
+                    )
+                )
+
         return {
             "entities": resolved,
             "relationships": relationships,

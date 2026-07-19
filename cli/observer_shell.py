@@ -1,6 +1,7 @@
 from cli.observer_dashboard import ObserverDashboard
 from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
+from core.services.http_download_service import HttpDownloadService
 
 
 class ObserverShell:
@@ -54,6 +55,9 @@ class ObserverShell:
 
             elif command.startswith("gobuster"):
                 self.run_gobuster(raw_command)
+
+            elif command.startswith("download"):
+                self.run_download(raw_command)
             
             elif command == "observations":
                 self.show_observations()
@@ -90,6 +94,8 @@ class ObserverShell:
         print("observations  Show canonical mission observations")
         print("gobuster <wordlist>")
         print("          Discover web content on the mission target")
+        print("download <url>")
+        print("          Retrieve an HTTP artifact into mission evidence")
 
 
         print("runs      Show tool runs for the active mission")
@@ -147,6 +153,74 @@ class ObserverShell:
             print()
             print("──────────────────────────────────────")
             print()
+
+    def run_download(self, raw_command: str):
+        """
+        Retrieve an HTTP artifact and attach it to the active mission.
+
+        Usage:
+            download <url>
+            download <url> <host-header>
+        """
+        parts = raw_command.split()
+
+        if len(parts) == 2:
+            url = parts[1]
+            host_header = None
+
+        elif len(parts) == 3:
+            url = parts[1]
+            host_header = parts[2]
+
+        else:
+            print()
+            print("Usage:")
+            print("  download <url>")
+            print("  download <url> <host-header>")
+            print()
+            return
+
+        print()
+        print("Medusa")
+        print(f"Retrieving artifact from {url}...")
+        print()
+
+        try:
+            result = HttpDownloadService().run(
+                url,
+                host_header=host_header,
+            )
+        except Exception as exc:
+            print(f"Artifact retrieval failed: {exc}")
+            print()
+            return
+
+        tool_run = result["tool_run"]
+        observations = result["observations"]
+
+        self.context["http_download_run_id"] = tool_run.id
+        self.context["http_artifacts"] = (
+            self.context.get("http_artifacts", 0)
+            + len(observations)
+        )
+
+        print("Artifact retrieval complete.")
+        print(f"Run          : {tool_run.id}")
+        print(f"Observations : {len(observations)}")
+
+        for observation in observations:
+            data = observation.data
+
+            print()
+            print(data["filename"])
+            print(f"  Evidence : {data['evidence_path']}")
+            print(f"  SHA256   : {data['sha256']}")
+            print(f"  Size     : {data['size']}")
+
+            if data["content_type"]:
+                print(f"  Type     : {data['content_type']}")
+
+        print()
 
     def show_ports(self):
         print()
