@@ -1,4 +1,4 @@
-from core.medusa import Medusa
+from command.medusa import Medusa
 
 
 medusa = Medusa()
