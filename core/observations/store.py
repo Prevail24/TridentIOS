@@ -1,6 +1,6 @@
 from core.observations.observation import Observation
 from core.observations.types import ObservationType
-
+_UNSET = object()
 
 class ObservationStore:
     """
@@ -36,6 +36,65 @@ class ObservationStore:
         """
 
         return tuple(self._observations)
+    
+    def find(
+        self,
+        *,
+        observation_type: ObservationType | None = None,
+        value: str | None = None,
+        source: str | None = None,
+        scope: str | None | object = _UNSET,
+    ) -> tuple[Observation, ...]:
+        """
+        Return observations matching every supplied filter.
+
+        With no filters, return every observation.
+
+        scope=None explicitly matches observations with no scope.
+        Omitting scope disables scope filtering.
+        """
+
+        return tuple(
+            observation
+            for observation in self._observations
+            if (
+                observation_type is None
+                or observation.type is observation_type
+            )
+            and (
+                value is None
+                or observation.value == value
+            )
+            and (
+                source is None
+                or observation.source == source
+            )
+            and (
+                scope is _UNSET
+                or observation.scope == scope
+            )
+        )
+
+    def exists(
+        self,
+        *,
+        observation_type: ObservationType | None = None,
+        value: str | None = None,
+        source: str | None = None,
+        scope: str | None | object = _UNSET,
+    ) -> bool:
+        """
+        Return True when at least one observation matches all filters.
+        """
+
+        return bool(
+            self.find(
+                observation_type=observation_type,
+                value=value,
+                source=source,
+                scope=scope,
+            )
+        )
 
     def find_by_type(
         self,

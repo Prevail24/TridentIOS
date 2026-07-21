@@ -142,3 +142,113 @@ def test_clear_removes_all_observations():
     assert len(store) == 0
     assert store.all() == ()
     assert not store.contains(observation)
+
+def test_find_combines_type_and_scope_filters():
+    store = ObservationStore()
+
+    expected = make_observation(
+        ObservationType.HOSTNAME,
+        "paper.htb",
+        scope="10.10.11.143",
+    )
+
+    wrong_type = make_observation(
+        ObservationType.PORT,
+        "80",
+        scope="10.10.11.143",
+    )
+
+    wrong_scope = make_observation(
+        ObservationType.HOSTNAME,
+        "admin.paper.htb",
+        scope="10.10.11.200",
+    )
+
+    store.add(expected)
+    store.add(wrong_type)
+    store.add(wrong_scope)
+
+    assert store.find(
+        observation_type=ObservationType.HOSTNAME,
+        scope="10.10.11.143",
+    ) == (expected,)
+
+
+def test_find_can_filter_by_value():
+    store = ObservationStore()
+
+    port_80 = make_observation(
+        ObservationType.PORT,
+        "80",
+    )
+
+    port_443 = make_observation(
+        ObservationType.PORT,
+        "443",
+    )
+
+    store.add(port_80)
+    store.add(port_443)
+
+    assert store.find(
+        observation_type=ObservationType.PORT,
+        value="80",
+        scope="paper.htb",
+    ) == (port_80,)
+
+
+def test_find_returns_empty_tuple_when_nothing_matches():
+    store = ObservationStore()
+
+    assert store.find(
+        observation_type=ObservationType.HOSTNAME,
+        scope="missing.htb",
+    ) == ()
+
+
+def test_exists_returns_true_for_matching_observation():
+    store = ObservationStore()
+
+    store.add(
+        make_observation(
+            ObservationType.PORT,
+            "80",
+        )
+    )
+
+    assert store.exists(
+        observation_type=ObservationType.PORT,
+        value="80",
+        scope="paper.htb",
+    )
+
+
+def test_exists_returns_false_when_nothing_matches():
+    store = ObservationStore()
+
+    assert not store.exists(
+        observation_type=ObservationType.TECHNOLOGY,
+        value="Apache",
+        scope="paper.htb",
+    )
+
+
+def test_find_can_explicitly_match_unscoped_observations():
+    store = ObservationStore()
+
+    unscoped = make_observation(
+        ObservationType.HOSTNAME,
+        "paper.htb",
+        scope=None,
+    )
+
+    scoped = make_observation(
+        ObservationType.HOSTNAME,
+        "admin.paper.htb",
+        scope="10.10.11.143",
+    )
+
+    store.add(unscoped)
+    store.add(scoped)
+
+    assert store.find(scope=None) == (unscoped,)
