@@ -93,14 +93,17 @@ def test_recon_mission_produces_operational_brief(
         for action in nmap_brief.priority_actions
     )
 
-    def run_httpx(command, check, capture_output, text):
-        assert check is True
+    def run_httpx(command, capture_output, text):
         assert capture_output is True
         assert text is True
-        assert command[:3] == ["httpx", "-u", "http://192.0.2.10"]
+        assert command[1:3] == [
+            "-u",
+            "http://192.0.2.10",
+        ]
         assert "-location" in command
 
         return SimpleNamespace(
+            returncode=0,
             stdout=json.dumps(
                 {
                     "url": "http://192.0.2.10",
@@ -113,8 +116,10 @@ def test_recon_mission_produces_operational_brief(
                     "webserver": "nginx",
                     "tech": ["nginx"],
                 }
-            )
+            ),
+            stderr="",
         )
+
 
     monkeypatch.setattr(
         "core.adapters.httpx_adapter.subprocess.run",
