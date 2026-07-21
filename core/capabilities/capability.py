@@ -13,6 +13,7 @@ class Capability(ABC):
     Capabilities never execute tools directly.
     """
 
+    id: str = ""
     name: str = ""
     description: str = ""
 

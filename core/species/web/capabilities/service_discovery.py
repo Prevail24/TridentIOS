@@ -3,9 +3,8 @@ from core.species.web.weapons import NmapWeapon
 
 
 class ServiceDiscoveryCapability(Capability):
-
+    id = "web.recon.service-discovery"
     name = "Service Discovery"
-
     description = (
         "Discover exposed network services."
     )

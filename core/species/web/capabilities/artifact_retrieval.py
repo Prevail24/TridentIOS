@@ -3,6 +3,7 @@ from core.species.web.weapons import HttpDownloadWeapon
 
 
 class ArtifactRetrievalCapability(Capability):
+    id = "web.recon.artifact-retrieval"
     name = "Artifact Retrieval"
     description = "Retrieve HTTP artifacts into mission evidence."
 

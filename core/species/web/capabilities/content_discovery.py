@@ -3,6 +3,7 @@ from core.species.web.weapons import GobusterWeapon
 
 
 class ContentDiscoveryCapability(Capability):
+    id = "web.recon.content-discovery"
     name = "Content Discovery"
     description = "Discover paths beneath observed HTTP surfaces."
 

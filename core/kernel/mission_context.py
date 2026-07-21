@@ -218,3 +218,58 @@ class MissionContext:
             )
 
         return target
+    
+    def has_service(self, name: str) -> bool:
+        return any(
+            service["service"].lower() == name.lower()
+            for service in self.services()
+        )
+
+
+    def has_web_surface(self) -> bool:
+        return len(self.web_surfaces()) > 0
+
+
+    def has_vhosts(self) -> bool:
+        return len(self.web_vhosts()) > 0
+
+
+    def has_open_port(self, port: int) -> bool:
+        return any(
+            item["port"] == port
+            for item in self.open_ports()
+        )
+
+    # ----------------------------
+    # Planner Helper Methods
+    # ----------------------------
+
+    def has_service(self, name: str) -> bool:
+        """
+        True if the active mission contains the named service.
+        """
+        return any(
+            service["service"].lower() == name.lower()
+            for service in self.services()
+        )
+
+    def has_open_port(self, port: int) -> bool:
+        """
+        True if the specified port is open.
+        """
+        return any(
+            p["port"] == port
+            for p in self.open_ports()
+        )
+
+    def has_web_surface(self) -> bool:
+        """
+        True once HTTP reconnaissance has created endpoint observations.
+        """
+        return len(self.web_surfaces()) > 0
+
+    def has_vhosts(self) -> bool:
+        """
+        True once virtual host enumeration has been performed.
+        """
+        return len(self.web_vhosts()) > 0

@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import json
 import subprocess
 from urllib.parse import urlparse, urlunparse
@@ -29,6 +31,33 @@ class HttpxAdapter(ToolAdapter):
         self.translator = HttpxObservationTranslator()
         self.observation_engine = ObservationEngine()
 
+    def _binary(self) -> str:
+        configured = os.environ.get("TRIDENT_HTTPX_BINARY")
+
+        if configured:
+            binary = Path(configured).expanduser()
+
+            if not binary.is_file():
+                raise RuntimeError(
+                    f"Configured ProjectDiscovery HTTPX binary does not exist: "
+                    f"{binary}"
+                )
+
+            return str(binary)
+
+        default = Path.home() / "go" / "bin" / "httpx"
+
+        if default.is_file():
+            return str(default)
+
+        raise RuntimeError(
+            "ProjectDiscovery HTTPX was not found. "
+            "Install it with:\n"
+            "go install -v "
+            "github.com/projectdiscovery/httpx/cmd/httpx@latest\n"
+            "Or set TRIDENT_HTTPX_BINARY to its executable path."
+        )
+
     def execute(self) -> dict:
         mission_id = self.engine.state.get_active_mission()
 
@@ -38,8 +67,13 @@ class HttpxAdapter(ToolAdapter):
             mission_id=mission_id,
         )
 
+        httpx_binary = os.environ.get(
+            "TRIDENT_HTTPX_BINARY",
+            "/Users/darren/go/bin/httpx",
+        )
+
         command = [
-            "httpx",
+            httpx_binary,
             "-u",
             self.target,
             "-json",
@@ -55,11 +89,25 @@ class HttpxAdapter(ToolAdapter):
             command.extend(["-H", f"Host: {self.host_header}"])
 
         result = subprocess.run(
-            command,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+    command,
+    capture_output=True,
+    text=True,
+)
+
+        if result.returncode != 0:
+            stderr = result.stderr.strip() or "No stderr was returned."
+            stdout = result.stdout.strip()
+
+            message = (
+                f"HTTPX failed with exit code {result.returncode}.\n"
+                f"Command: {' '.join(command)}\n"
+                f"stderr: {stderr}"
+            )
+
+            if stdout:
+                message += f"\nstdout: {stdout}"
+
+            raise RuntimeError(message)
 
         records = [
             json.loads(line)

@@ -9,6 +9,8 @@ from cli.commands.http_artifact import (
 from cli.observer_dashboard import ObserverDashboard
 from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
+from core.planner.planner import Planner
+from core.renderers.planner_renderer import PlannerRenderer
 
 
 class ObserverShell:
@@ -87,6 +89,9 @@ class ObserverShell:
             elif command == "web":
                 self.show_web()
 
+            elif command == "plan":
+                self.show_plan()
+
             elif command == "all":
                 self.show_all()
 
@@ -103,7 +108,8 @@ class ObserverShell:
         
         print("status    Show the Observatory dashboard")
         print("all       Show the complete mission intelligence view")
-        
+        print("plan      Show the current mission plan")
+
         print("ports     Show open ports for the active mission")
         print("services  Show discovered network services")
         print("web       Show discovered HTTP surfaces")
@@ -767,6 +773,18 @@ class ObserverShell:
                 print(f"  Redirect: {data['redirect_location']}")
 
             print()
+
+    def show_plan(self):
+        try:
+            planner = Planner()
+            recommendations = planner.plan(self.mission_context)
+        except RuntimeError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        PlannerRenderer().render(recommendations)    
 
     def _parse_options(
         self,

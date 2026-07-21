@@ -3,6 +3,7 @@ from core.species.web.weapons import GobusterVhostWeapon
 
 
 class VirtualHostDiscoveryCapability(Capability):
+    id = "web.recon.virtual-host-discovery"
     name = "Virtual Host Discovery"
     description = "Discover HTTP virtual hosts for known web targets."
 

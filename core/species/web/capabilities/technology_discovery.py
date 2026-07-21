@@ -3,6 +3,7 @@ from core.species.web.weapons import HttpxWeapon
 
 
 class TechnologyDiscoveryCapability(Capability):
+    id = "web.recon.technology-discovery"
     name = "Technology Discovery"
     description = "Identify reachable HTTP endpoints and technologies."
 
