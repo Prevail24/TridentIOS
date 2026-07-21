@@ -26,9 +26,18 @@ def test_recommends_vhost_discovery_for_redirect():
     recommendation = RedirectVhostRule().evaluate(context)
 
     assert recommendation is not None
-    assert recommendation.capability == "Virtual Host Discovery"
+    assert (
+        recommendation.capability_id
+        == "web.recon.virtual-host-discovery"
+    )
     assert recommendation.confidence == "High"
-    assert recommendation.rule == "Redirect Virtual Host Rule"
+    assert recommendation.rule == "RedirectVhostRule"
+    assert recommendation.required_inputs == (
+        "target",
+        "domain",
+        "wordlist",
+    )
+    assert recommendation.executable is False
 
 
 def test_returns_none_without_redirect():
@@ -54,12 +63,7 @@ def test_returns_none_when_vhosts_already_exist():
                 "redirect_location": "http://paper.htb/",
             }
         ],
-        vhosts=[
-            {
-                "hostname": "paper.htb",
-                "url": "http://paper.htb/",
-            }
-        ],
+        vhosts=["office.paper.htb"],
     )
 
     recommendation = RedirectVhostRule().evaluate(context)
