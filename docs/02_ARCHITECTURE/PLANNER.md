@@ -1,318 +1,392 @@
-# TridentIOS Planner Architecture
+# TridentIOS Planner v2
 
 ## Status
 
-**Proposed Architecture — Planner v1**
+**Design Phase**
 
 ---
 
-# Purpose
+# Mission
 
-The Planner is TridentIOS's deterministic investigation guidance layer.
+Transform the TridentIOS Planner from a predefined capability sequence into an observation-driven investigation planner.
 
-Its responsibility is to examine the current mission state and recommend the next appropriate investigative capabilities.
+Planner v2 examines the current mission intelligence and recommends the most valuable capability to execute next.
 
-The Planner does **not** execute tools.
-
-The Planner does **not** parse tool output.
-
-The Planner does **not** inspect runtime files.
-
-The Planner does **not** directly access repositories.
-
-The Planner reasons only through the operational intelligence exposed by `MissionContext`.
+The planner does **not** execute tools.
 
 ---
 
 # Core Principle
 
-> The Planner recommends **what Trident should do next**, not **how a tool should do it.**
+The Planner recommends capabilities.
 
-The Planner recommends **Capabilities**.
-
-Species, Serpents, Weapons, Sensors, and Adapters determine how those Capabilities are executed.
-
----
-
-# Architectural Position
+Execution remains the responsibility of the existing architecture.
 
 ```text
-Sensors
-    ↓
-Adapters
-    ↓
-Parsers
-    ↓
-Canonical Observations
-    ↓
-Observation Engine
-    ↓
-Entities & Relationships
-    ↓
-MissionContext
-    ↓
 Planner
     ↓
-Capability Recommendations
+Recommendation
     ↓
-Observer Decision
+Capability Router
+    ↓
+Capability
+    ↓
+Weapon
+    ↓
+Sensor
+    ↓
+Adapter
+    ↓
+Translator
+    ↓
+Observation Emitter
 ```
-
-The Planner sits above mission intelligence and below the Observer.
-
-It never bypasses existing architectural boundaries.
 
 ---
 
-# Operational Contract
+# Inputs
 
-The Planner receives a `MissionContext`.
+Planner v2 may inspect:
 
-```python
-recommendations = planner.plan(context)
-```
-
-The Planner queries mission intelligence through methods such as:
-
-```python
-context.open_ports()
-context.services()
-context.web_surfaces()
-context.web_vhosts()
-```
-
-Future MissionContext methods may include:
-
-```python
-context.artifacts()
-context.technologies()
-context.credentials()
-context.users()
-context.files()
-context.processes()
-context.sockets()
-context.certificates()
-context.dns_records()
-context.relationships()
-```
-
-The Planner must **never** access:
-
-```python
-ObservationRepository
-ToolRunRepository
-StateService
-runtime JSON files
-raw tool output
-adapter results
-sensor internals
-```
-
-Those implementation details remain behind `MissionContext`.
+- Mission target
+- Mission state
+- Existing observations
+- Known entities
+- Known relationships
+- Open ports
+- Running services
+- Web applications
+- Virtual hosts
+- Previous capability executions
+- Failed recommendations
+- Deferred recommendations
 
 ---
 
-# Responsibilities
+# Outputs
 
-The Planner is responsible for:
-
-1. Evaluating the active mission's intelligence.
-2. Matching mission conditions against Planner Rules.
-3. Producing deterministic Capability Recommendations.
-4. Explaining why each recommendation exists.
-5. Identifying the intelligence that triggered each recommendation.
-6. Reporting whether the Capability currently exists.
-7. Avoiding duplicate recommendations.
-8. Returning recommendations without automatically executing them.
-
----
-
-# Non-Responsibilities
-
-The Planner is **not** responsible for:
-
-- Running tools.
-- Selecting command-line arguments.
-- Parsing output.
-- Creating observations.
-- Writing repositories.
-- Managing evidence.
-- Creating entities.
-- Creating relationships.
-- Making autonomous decisions.
-- Replacing the Observer.
-
----
-
-# Planner Rule
-
-A Planner Rule represents one proven investigative lesson.
-
-Each rule answers one question:
-
-> "Given these mission conditions, what capability should be recommended?"
-
-Rules should remain extremely small.
+The planner produces one or more ranked recommendations.
 
 Example:
 
+```yaml
+capability_id: virtual-host-discovery
+
+priority: High
+
+confidence: 0.92
+
+reason: >
+  HTTP service and hostname redirect observed.
+  Virtual host enumeration has not yet been completed.
+
+evidence:
+  - HTTP service detected
+  - Redirect contains hostname
+```
+
+---
+
+# Recommendation Model
+
+Every recommendation should contain:
+
+- capability_id
+- priority
+- confidence
+- reason
+- evidence
+- scope
+- created_at
+- status
+
+Recommended statuses:
+
+- pending
+- accepted
+- running
+- completed
+- failed
+- deferred
+- dismissed
+
+---
+
+# Planning Rules
+
+## HTTP Fingerprinting
+
+If an HTTP service exists and fingerprinting has not yet been performed:
+
 ```text
-Condition
+Recommend:
+http-fingerprinting
+```
 
-HTTP Redirect Detected
+---
 
-↓
+## Virtual Host Discovery
 
-Recommend
+If an HTTP service exists and a hostname or redirect has been observed:
 
+```text
+Recommend:
+virtual-host-discovery
+```
+
+---
+
+## Directory Discovery
+
+If a web application exists and directory discovery has not been completed for that scope:
+
+```text
+Recommend:
+directory-discovery
+```
+
+---
+
+## Header Collection
+
+If HTTP response headers have not yet been preserved:
+
+```text
+Recommend:
+http-header-collection
+```
+
+---
+
+## Artifact Collection
+
+If an interesting endpoint or page is discovered:
+
+```text
+Recommend:
+http-artifact-collection
+```
+
+---
+
+# Scope Awareness
+
+Every recommendation belongs to a specific scope.
+
+Examples:
+
+```text
+10.129.36.93
+
+bedside.htb
+
+research.bedside.htb
+
+http://research.bedside.htb/uploads/
+```
+
+Capabilities completed against one scope should **not** automatically apply to every other scope.
+
+---
+
+# Duplicate Prevention
+
+Planner v2 should not repeatedly recommend the same capability when:
+
+- already completed
+- currently running
+- explicitly dismissed
+- evidence has not changed
+
+Recommendations may be regenerated when:
+
+- new observations appear
+- scope expands
+- previous execution failed
+- mission intelligence changes
+
+---
+
+# Stopping Conditions
+
+The planner stops recommending work when:
+
+- no remaining recommendations exceed the confidence threshold
+- every applicable capability has completed
+- operator approval is required
+- mission has completed
+
+Stopping does **not** imply the investigation is finished.
+
+It only means there is currently insufficient evidence to justify another automated action.
+
+---
+
+# Confidence
+
+Suggested confidence levels:
+
+| Confidence | Meaning |
+|------------|---------|
+| 0.90–1.00 | Direct evidence |
+| 0.70–0.89 | Strong evidence |
+| 0.50–0.69 | Moderate evidence |
+| Below 0.50 | Do not automatically recommend |
+
+---
+
+# Priority
+
+Recommended priorities:
+
+- Critical
+- High
+- Medium
+- Low
+
+Priority represents investigative value.
+
+It does **not** represent vulnerability severity.
+
+---
+
+# Planning Loop
+
+```text
+Load Mission
+      ↓
+Review Observations
+      ↓
+Identify Missing Intelligence
+      ↓
+Match Intelligence Gaps
+to Capabilities
+      ↓
+Remove Duplicate Work
+      ↓
+Rank Recommendations
+      ↓
+Return Recommendations
+      ↓
+Capability Executes
+      ↓
+New Observations Created
+      ↓
+Repeat
+```
+
+---
+
+# Bedside Example
+
+Current observations:
+
+- Port 80 open
+- Apache detected
+- Redirect to bedside.htb
+- bedside.htb discovered
+- research.bedside.htb discovered
+
+Planner output:
+
+```text
+HTTP Service
+      ↓
+HTTP Fingerprinting
+
+Hostname Found
+      ↓
 Virtual Host Discovery
+
+New VHost
+      ↓
+HTTP Fingerprinting
+
+Fingerprint Complete
+      ↓
+Directory Discovery
+
+Interesting Surface
+      ↓
+Artifact Collection
 ```
-
-Another example:
-
-```text
-Condition
-
-Downloaded Archive
-
-↓
-
-Recommend
-
-Archive Inspection
-```
-
-Rules should contain no tool-specific logic.
-
-They recommend Capabilities, never Weapons.
 
 ---
 
-# Recommendation
+# Non-Goals
 
-A Recommendation contains:
+Planner v2 does **not**:
 
-- Capability
-- Confidence
-- Reason
-- Triggering Evidence
-- Availability
-
-Example:
-
-```text
-Capability
-
-Virtual Host Discovery
-
-Reason
-
-HTTP redirect indicates a canonical hostname.
-
-Confidence
-
-High
-
-Status
-
-Available
-```
-
-If the Capability has not yet been implemented:
-
-```text
-Capability
-
-Archive Inspection
-
-Status
-
-Missing Capability
-
-Reason
-
-Planner rule exists.
-Capability not yet implemented.
-```
-
-The Planner should still recommend it.
+- generate shell commands
+- invoke tools directly
+- bypass the Capability Router
+- modify observations
+- rewrite historical evidence
+- convert hypotheses into facts
+- perform unrestricted autonomous execution
 
 ---
 
-# Mission Intelligence
+# Implementation Roadmap
 
-The Planner reasons from Mission Intelligence rather than raw observations.
+## Phase 1
 
-MissionContext converts thousands of individual observations into operational facts.
-
-Examples include:
-
-- Open Services
-- Web Surfaces
-- Virtual Hosts
-- Technologies
-- Artifacts
-- Credentials
-- Files
-- Relationships
-
-The Planner consumes these facts instead of individual tool output.
+- Recommendation model
+- Recommendation statuses
+- Scope awareness
+- Duplicate prevention
 
 ---
 
-# Design Philosophy
+## Phase 2
 
-Every completed mission should improve Trident.
-
-A mission produces:
-
-- New observations
-- New entities
-- New relationships
-- New Planner Rules
-- New Capabilities
-- Better investigations
-
-The Planner is therefore expected to grow continuously as Trident evolves.
-
-Every Hack The Box machine, assessment, engagement, or investigation should leave the Planner smarter than before.
+- Deterministic planning rules
+- Ranked recommendations
+- Confidence scoring
+- Human-readable reasoning
 
 ---
 
-# Long-Term Vision
+## Phase 3
 
-Today:
-
-```text
-Mission
-    ↓
-Planner
-    ↓
-Recommendations
-```
-
-Future:
-
-```text
-Mission
-    ↓
-Planner Rules
-    ↓
-Knowledge Graph
-    ↓
-Council
-    ↓
-Observer
-```
-
-Deterministic rules remain the foundation.
-
-Future AI systems reason on top of that foundation rather than replacing it.
+- Recursive planning
+- Recommendation history
+- Stopping conditions
+- Planner memory
 
 ---
 
-# Guiding Principle
+## Phase 4
 
-> Every mission should leave Trident smarter than it was before the mission began.
+- Observation weighting
+- Operator feedback
+- Mission learning
+- Adaptive recommendation scoring
 
-The Planner exists to capture those lessons and transform them into repeatable investigation doctrine.
+---
+
+# Success Criteria
+
+Planner v2 is complete when:
+
+- Recommendations are generated from observations.
+- Recommendations reference capability IDs only.
+- Every recommendation explains *why* it exists.
+- Duplicate work is prevented.
+- Recommendations are scoped correctly.
+- New observations automatically generate new investigative opportunities.
+- Existing execution architecture remains unchanged.
+
+---
+
+# Vision
+
+Planner v1 answered:
+
+> "What capability comes next?"
+
+Planner v2 answers:
+
+> "Given everything we currently know, what is the most valuable question to answer next, and which capability can answer it?"
+
+That shift transforms TridentIOS from a capability runner into an investigation engine.
