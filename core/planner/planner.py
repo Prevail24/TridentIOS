@@ -1,4 +1,5 @@
 from core.planner.registry import PlannerRegistry
+from core.planner.ranking import rank
 
 
 class Planner:
@@ -17,6 +18,4 @@ class Planner:
             if recommendation is not None:
                 recommendations.append(recommendation)
 
-        return recommendations
-
-        
+        return rank(recommendations)
