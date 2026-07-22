@@ -18,6 +18,7 @@ from core.command.capability_router import (
 )
 from core.species.web.web_species import WebSpecies
 from core.species.web.serpents import ReconSerpent
+import shlex
 from dataclasses import replace
 
 
@@ -34,6 +35,7 @@ class ObserverShell:
         self.context = context or {}
         self.mission_context = MissionContext()
         self.dashboard = ObserverDashboard()
+        self.planner = Planner()
 
     def run(self):
         self.dashboard.render(self.context)
@@ -789,8 +791,9 @@ class ObserverShell:
 
     def show_plan(self):
         try:
-            planner = Planner()
-            recommendations = planner.plan(self.mission_context)
+            recommendations = self.planner.plan(
+                self.mission_context
+            )
         except RuntimeError as exc:
             print()
             print(str(exc))
@@ -865,9 +868,10 @@ class ObserverShell:
             return
 
         try:
-            recommendations = Planner().plan(
+            recommendations = self.planner.plan(
                 self.mission_context
             )
+            
         except RuntimeError as exc:
             print()
             print(str(exc))

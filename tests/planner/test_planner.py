@@ -1,3 +1,4 @@
+from core.planner.history import PlannerHistory
 from core.planner.planner import Planner
 from core.planner.recommendation import (
     Recommendation,
@@ -59,6 +60,7 @@ def test_planner_collects_matching_recommendations():
         is RecommendationStatus.PENDING
     )
 
+
 def test_non_pending_recommendation_is_not_executable():
     recommendation = Recommendation(
         capability_id="web.recon.technology-discovery",
@@ -80,6 +82,7 @@ def test_planner_returns_empty_list_when_no_rules_match():
     recommendations = planner.plan(FakeMissionContext())
 
     assert recommendations == []
+
 
 def test_recommendation_captures_planning_metadata():
     recommendation = Recommendation(
@@ -113,3 +116,61 @@ def test_recommendation_captures_planning_metadata():
         "Virtual Host",
         "Hostname",
     )
+
+
+def test_planner_applies_running_status_from_history():
+    history = PlannerHistory()
+
+    history.mark_running(
+        "web.recon.technology-discovery",
+        None,
+    )
+
+    planner = Planner(history=history)
+    planner.registry = FakeRegistry()
+
+    recommendations = planner.plan(FakeMissionContext())
+
+    assert len(recommendations) == 1
+    assert (
+        recommendations[0].status
+        is RecommendationStatus.RUNNING
+    )
+    assert recommendations[0].executable is False
+
+
+def test_planner_suppresses_completed_recommendation():
+    history = PlannerHistory()
+
+    history.mark_completed(
+        "web.recon.technology-discovery",
+        None,
+    )
+
+    planner = Planner(history=history)
+    planner.registry = FakeRegistry()
+
+    recommendations = planner.plan(FakeMissionContext())
+
+    assert recommendations == []
+
+
+def test_planner_requeues_failed_recommendation():
+    history = PlannerHistory()
+
+    history.mark_failed(
+        "web.recon.technology-discovery",
+        None,
+    )
+
+    planner = Planner(history=history)
+    planner.registry = FakeRegistry()
+
+    recommendations = planner.plan(FakeMissionContext())
+
+    assert len(recommendations) == 1
+    assert (
+        recommendations[0].status
+        is RecommendationStatus.PENDING
+    )
+    assert recommendations[0].executable is True
