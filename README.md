@@ -18,6 +18,13 @@
 > *The goal is not to run every tool. The goal is to reduce uncertainty.*
 ---
 
+## Responsible Use
+
+TridentIOS is intended for authorized security research and assessment only.
+Use it solely on assets you own or have explicit permission to test. See
+[SECURITY_AND_LEGAL_NOTICE.md](SECURITY_AND_LEGAL_NOTICE.md) for details.
+
+---
 # Vision
 
 Trident is an open framework for building intelligence-driven systems.
