@@ -174,3 +174,27 @@ def test_planner_requeues_failed_recommendation():
         is RecommendationStatus.PENDING
     )
     assert recommendations[0].executable is True
+
+
+def test_planner_requeues_interrupted_recommendation():
+    history = PlannerHistory()
+
+    history.mark_status(
+        "web.recon.technology-discovery",
+        None,
+        RecommendationStatus.INTERRUPTED,
+    )
+
+    planner = Planner(history=history)
+    planner.registry = FakeRegistry()
+
+    recommendations = planner.plan(FakeMissionContext())
+
+    assert len(recommendations) == 1
+    assert (
+        recommendations[0].status
+        is RecommendationStatus.PENDING
+    )
+    assert recommendations[0].executable is True
+
+    

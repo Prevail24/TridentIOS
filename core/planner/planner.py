@@ -38,11 +38,17 @@ class Planner:
             if stored_status is RecommendationStatus.COMPLETED:
                 continue
 
-            # Failed work becomes eligible for another operator-approved
-            # attempt. Other stored lifecycle states remain visible.
+                        # Failed or interrupted work becomes eligible for another
+            # operator-approved attempt. Other lifecycle states remain
+            # visible but cannot be executed again.
+            retryable_statuses = {
+                RecommendationStatus.FAILED,
+                RecommendationStatus.INTERRUPTED,
+            }
+
             if (
                 stored_status is not None
-                and stored_status is not RecommendationStatus.FAILED
+                and stored_status not in retryable_statuses
             ):
                 recommendation = replace(
                     recommendation,

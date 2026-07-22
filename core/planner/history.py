@@ -200,6 +200,42 @@ class PlannerHistory:
             self.status_for(capability_id, scope)
             is RecommendationStatus.COMPLETED
         )
+    
+    def recover_interrupted(self) -> int:
+        """
+        Mark unfinished lifecycle states from an earlier process
+        as interrupted.
+
+        Returns the number of recovered recommendations.
+        """
+        recoverable_statuses = {
+            RecommendationStatus.ACCEPTED,
+            RecommendationStatus.RUNNING,
+        }
+
+        recovered_count = sum(
+            1
+            for status in self._statuses.values()
+            if status in recoverable_statuses
+        )
+
+        if recovered_count == 0:
+            return 0
+
+        updated_statuses = {
+            record: (
+                RecommendationStatus.INTERRUPTED
+                if status in recoverable_statuses
+                else status
+            )
+            for record, status in self._statuses.items()
+        }
+
+        # Persist first so memory cannot move ahead of durable state.
+        self._persist(updated_statuses)
+        self._statuses = updated_statuses
+
+        return recovered_count
 
     def clear(self) -> None:
         if self.mission_id is not None and self.repository is not None:

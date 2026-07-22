@@ -8,6 +8,7 @@ class RecommendationStatus(str, Enum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
+    INTERRUPTED = "interrupted"
     DEFERRED = "deferred"
     DISMISSED = "dismissed"
 

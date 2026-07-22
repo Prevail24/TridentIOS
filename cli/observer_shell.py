@@ -45,6 +45,8 @@ class ObserverShell:
             else PlannerHistory()
         )
 
+        planner_history.recover_interrupted()
+
         self.planner = Planner(
             history=planner_history,
         )

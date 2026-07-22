@@ -42,3 +42,33 @@ def test_shell_reloads_active_mission_planner_history(
         )
         is RecommendationStatus.COMPLETED
     )
+
+def test_shell_recovers_running_work_after_restart(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        Config,
+        "KNOWLEDGE_DIR",
+        tmp_path / "knowledge",
+    )
+
+    StateService().set_active_mission(MISSION_ID)
+
+    first_shell = ObserverShell()
+
+    first_shell.planner.history.mark_running(
+        CAPABILITY_ID,
+        SCOPE,
+    )
+
+    second_shell = ObserverShell()
+
+    assert (
+        second_shell.planner.history.status_for(
+            CAPABILITY_ID,
+            SCOPE,
+        )
+        is RecommendationStatus.INTERRUPTED
+    )

@@ -118,3 +118,76 @@ def test_repository_requires_mission_id(tmp_path):
         match="mission ID is required",
     ):
         PlannerHistory(repository=repository)
+def test_recovers_unfinished_persistent_lifecycle_states(tmp_path):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    history = PlannerHistory(
+        mission_id="MIS-2026-0001",
+        repository=repository,
+    )
+
+    history.mark_accepted(
+        "web.recon.technology-discovery",
+        "10.10.11.10",
+    )
+
+    history.mark_running(
+        "web.recon.virtual-host-discovery",
+        "paper.htb",
+    )
+
+    history.mark_completed(
+        "web.recon.content-discovery",
+        "http://10.10.11.10",
+    )
+
+    assert history.recover_interrupted() == 2
+
+    reloaded = PlannerHistory(
+        mission_id="MIS-2026-0001",
+        repository=repository,
+    )
+
+    assert (
+        reloaded.status_for(
+            "web.recon.technology-discovery",
+            "10.10.11.10",
+        )
+        is RecommendationStatus.INTERRUPTED
+    )
+
+    assert (
+        reloaded.status_for(
+            "web.recon.virtual-host-discovery",
+            "paper.htb",
+        )
+        is RecommendationStatus.INTERRUPTED
+    )
+
+    assert (
+        reloaded.status_for(
+            "web.recon.content-discovery",
+            "http://10.10.11.10",
+        )
+        is RecommendationStatus.COMPLETED
+    )
+
+
+def test_recovery_is_noop_without_unfinished_work(tmp_path):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    history = PlannerHistory(
+        mission_id="MIS-2026-0001",
+        repository=repository,
+    )
+
+    history.mark_completed(
+        CAPABILITY_ID,
+        SCOPE,
+    )
+
+    assert history.recover_interrupted() == 0
