@@ -1,5 +1,5 @@
-from core.planner.rule import PlannerRule
 from core.planner.recommendation import Recommendation
+from core.planner.rule import PlannerRule
 
 
 class HTTPReconRule(PlannerRule):
@@ -23,5 +23,6 @@ class HTTPReconRule(PlannerRule):
                 "has not yet been performed."
             ),
             confidence="High",
+            scope=context.target(),
             rule=self.__class__.__name__,
-)
+        )

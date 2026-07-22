@@ -36,6 +36,7 @@ def test_recommends_vhost_discovery_for_redirect():
         ("target", "http://10.10.11.10"),
         ("domain", "paper.htb"),
     )
+    assert recommendation.scope == "paper.htb"
     assert recommendation.required_inputs == (
         "wordlist",
     )
@@ -86,9 +87,32 @@ def test_keeps_unknown_vhost_inputs_required():
 
     assert recommendation is not None
     assert recommendation.inputs == ()
+    assert recommendation.scope is None
     assert recommendation.required_inputs == (
         "target",
         "domain",
         "wordlist",
     )
     assert recommendation.executable is False
+
+def test_uses_http_target_as_scope_for_relative_redirect():
+    context = FakeMissionContext(
+        surfaces=[
+            {
+                "url": "http://10.10.11.10",
+                "redirect_location": "/login",
+            }
+        ]
+    )
+
+    recommendation = RedirectVhostRule().evaluate(context)
+
+    assert recommendation is not None
+    assert recommendation.scope == "http://10.10.11.10"
+    assert recommendation.inputs == (
+        ("target", "http://10.10.11.10"),
+    )
+    assert recommendation.required_inputs == (
+        "domain",
+        "wordlist",
+    )

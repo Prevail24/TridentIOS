@@ -34,6 +34,10 @@ class RedirectVhostRule(PlannerRule):
                 redirect_location
             ).hostname
 
+            # Absolute redirects use the redirected hostname.
+            # Relative redirects fall back to the original HTTP target.
+            scope = domain or target
+
             inputs = []
             required_inputs = []
 
@@ -59,6 +63,7 @@ class RedirectVhostRule(PlannerRule):
                     "routing."
                 ),
                 confidence="High",
+                scope=scope,
                 inputs=tuple(inputs),
                 required_inputs=tuple(required_inputs),
                 rule=self.__class__.__name__,
