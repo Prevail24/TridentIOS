@@ -152,3 +152,87 @@ def test_clear_history():
         CAPABILITY_ID,
         SCOPE,
     ) is None
+
+def test_entries_returns_sorted_read_only_snapshot():
+    history = PlannerHistory()
+
+    history.mark_completed(
+        "web.recon.virtual-host-discovery",
+        "paper.htb",
+    )
+
+    history.mark_failed(
+        "web.recon.technology-discovery",
+        "10.10.11.10",
+    )
+
+    entries = history.entries()
+
+    assert isinstance(entries, tuple)
+    assert len(entries) == 2
+
+    assert (
+        entries[0].capability_id
+        == "web.recon.technology-discovery"
+    )
+    assert entries[0].scope == "10.10.11.10"
+    assert entries[0].status is RecommendationStatus.FAILED
+
+    assert (
+        entries[1].capability_id
+        == "web.recon.virtual-host-discovery"
+    )
+    assert entries[1].scope == "paper.htb"
+    assert entries[1].status is RecommendationStatus.COMPLETED
+
+
+def test_entries_filters_by_status():
+    history = PlannerHistory()
+
+    history.mark_completed(
+        "web.recon.technology-discovery",
+        "10.10.11.10",
+    )
+
+    history.mark_failed(
+        "web.recon.virtual-host-discovery",
+        "paper.htb",
+    )
+
+    entries = history.entries(
+        status=RecommendationStatus.FAILED,
+    )
+
+    assert len(entries) == 1
+    assert (
+        entries[0].capability_id
+        == "web.recon.virtual-host-discovery"
+    )
+    assert entries[0].status is RecommendationStatus.FAILED
+
+
+def test_entries_filters_by_scope():
+    history = PlannerHistory()
+
+    history.mark_completed(
+        "web.recon.technology-discovery",
+        "10.10.11.10",
+    )
+
+    history.mark_status(
+        "web.recon.virtual-host-discovery",
+        "paper.htb",
+        RecommendationStatus.INTERRUPTED,
+    )
+
+    entries = history.entries(
+        scope="paper.htb",
+    )
+
+    assert len(entries) == 1
+    assert (
+        entries[0].capability_id
+        == "web.recon.virtual-host-discovery"
+    )
+    assert entries[0].scope == "paper.htb"
+    assert entries[0].status is RecommendationStatus.INTERRUPTED

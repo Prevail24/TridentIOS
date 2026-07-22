@@ -11,6 +11,7 @@ from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
 from core.planner.planner import Planner
 from core.planner.history import PlannerHistory
+from core.planner.recommendation import RecommendationStatus
 from core.renderers.planner_renderer import PlannerRenderer
 from core.command.capability_router import (
     CapabilityExecutionError,
@@ -114,6 +115,12 @@ class ObserverShell:
             elif command == "web":
                 self.show_web()
 
+            elif (
+                command == "plan history"
+                or command.startswith("plan history ")
+            ):
+                self.show_plan_history(raw_command)
+
             elif command.startswith("plan execute"):
                 self.execute_plan_recommendation(raw_command)
 
@@ -136,7 +143,8 @@ class ObserverShell:
 
         print("status    Show the Observatory dashboard")
         print("all       Show the complete mission intelligence view")
-        print("plan      Show the current mission plan")
+        print("plan history [--status <status>] [--scope <scope>]")
+        print("          Show read-only Planner lifecycle history")
         print("plan execute <number> [--wordlist <path>]")
         print("          Supply missing inputs and execute after confirmation")
         print("ports     Show open ports for the active mission")
@@ -801,6 +809,121 @@ class ObserverShell:
             if data["redirect_location"]:
                 print(f"  Redirect: {data['redirect_location']}")
 
+            print()
+
+    def show_plan_history(
+        self,
+        raw_command: str,
+    ) -> None:
+        """
+        Display read-only Planner lifecycle history.
+
+        Usage:
+            plan history
+            plan history --status interrupted
+            plan history --scope 10.10.11.10
+            plan history --status completed --scope 10.10.11.10
+        """
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            print()
+            print(f"Could not parse command: {exc}")
+            print()
+            return
+
+        try:
+            positionals, options = self._parse_options(
+                parts[2:],
+                value_options={
+                    "--status",
+                    "--scope",
+                },
+            )
+        except ValueError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        if positionals:
+            print()
+            print(
+                "Usage: plan history "
+                "[--status <status>] "
+                "[--scope <scope>]"
+            )
+            print()
+            return
+
+        status_filter = None
+        status_value = options.get("--status")
+
+        if status_value is not None:
+            try:
+                status_filter = RecommendationStatus(
+                    status_value.lower()
+                )
+            except ValueError:
+                valid_statuses = ", ".join(
+                    status.value
+                    for status in RecommendationStatus
+                )
+
+                print()
+                print(
+                    f"Unknown Planner status: {status_value}"
+                )
+                print(f"Valid statuses: {valid_statuses}")
+                print()
+                return
+
+        scope_filter = options.get("--scope")
+
+        entries = self.planner.history.entries(
+            status=status_filter,
+            scope=scope_filter,
+        )
+
+        print()
+        print("══════════════════════════════════════")
+        print("          PLANNER HISTORY")
+        print("══════════════════════════════════════")
+        print()
+
+        mission_id = self.planner.history.mission_id
+
+        if mission_id is not None:
+            print(f"Mission : {mission_id}")
+
+        if status_filter is not None:
+            print(f"Status  : {status_filter.value}")
+
+        if scope_filter is not None:
+            print(f"Scope   : {scope_filter}")
+
+        if (
+            mission_id is not None
+            or status_filter is not None
+            or scope_filter is not None
+        ):
+            print()
+
+        if not entries:
+            print("No Planner history matches this query.")
+            print()
+            return
+
+        for index, entry in enumerate(entries, start=1):
+            scope = (
+                entry.scope
+                if entry.scope is not None
+                else "mission-wide"
+            )
+
+            print(f"{index}. {entry.capability_id}")
+            print(f"   Status : {entry.status.value}")
+            print(f"   Scope  : {scope}")
             print()
 
     def show_plan(self):

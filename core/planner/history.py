@@ -12,6 +12,13 @@ class RecommendationRecord:
     scope: str | None
 
 
+@dataclass(frozen=True)
+class PlannerHistoryEntry:
+    capability_id: str
+    scope: str | None
+    status: RecommendationStatus
+
+
 class PlannerHistory:
     """
     Tracks recommendation lifecycle state.
@@ -200,7 +207,46 @@ class PlannerHistory:
             self.status_for(capability_id, scope)
             is RecommendationStatus.COMPLETED
         )
-    
+
+    def entries(
+        self,
+        *,
+        status: RecommendationStatus | None = None,
+        scope: str | None = None,
+    ) -> tuple[PlannerHistoryEntry, ...]:
+        """
+        Return a deterministic, read-only snapshot of Planner history.
+
+        Optional status and scope filters use exact matching.
+        """
+        matching_entries = [
+            PlannerHistoryEntry(
+                capability_id=record.capability_id,
+                scope=record.scope,
+                status=stored_status,
+            )
+            for record, stored_status in self._statuses.items()
+            if (
+                status is None
+                or stored_status is status
+            )
+            and (
+                scope is None
+                or record.scope == scope
+            )
+        ]
+
+        return tuple(
+            sorted(
+                matching_entries,
+                key=lambda entry: (
+                    entry.capability_id,
+                    entry.scope or "",
+                    entry.status.value,
+                ),
+            )
+        )
+
     def recover_interrupted(self) -> int:
         """
         Mark unfinished lifecycle states from an earlier process
