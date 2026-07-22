@@ -44,3 +44,23 @@ Major Milestone
 • Refined long-term philosophy and product direction
 
 "Intelligence wins before the first packet is sent."
+
+
+
+# Changelog July 11th, 2026
+
+## [2.0.0-dev.1] - The Great Hunt
+
+### Added
+- Command subsystem established
+- Species architecture introduced
+- Web Species scaffolded
+- Species Registry
+- Base Species class
+
+### Changed
+- Medusa moved into Command
+- Architecture aligned with Trident Doctrine
+
+### Notes
+This marks the beginning of Trident v2 ("The Great Hunt"), introducing the biological architecture of Species, Serpents, Capabilities, and Weapons.

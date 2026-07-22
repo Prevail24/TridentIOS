@@ -6,6 +6,10 @@ from core.services.mission_service import MissionService
 from core.services.observation_service import ObservationService
 from core.services.evidence_service import EvidenceService
 from core.agents.weaver_brief import WeaverBrief
+from core.planner.planner import Planner
+from core.renderers.planner_renderer import PlannerRenderer
+
+
 
 console = Console()
 
@@ -94,3 +98,14 @@ class ObservatoryDashboard:
         console.print(
             f"[italic dim]{Config.BRAND_QUOTE}[/italic dim]"
         )
+    def show_plan(self):
+        print()
+
+        try:
+            recommendations = Planner().plan(self.mission_context)
+        except RuntimeError as exc:
+            print(str(exc))
+            print()
+            return
+
+        PlannerRenderer().render(recommendations)

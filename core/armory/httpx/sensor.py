@@ -1,5 +1,5 @@
 from core.armory.sensor import Sensor
-from core.armory.httpx.adapter import HttpxAdapter
+from core.adapters.httpx_adapter import HttpxAdapter
 
 
 class HttpxSensor(Sensor):
@@ -16,9 +16,18 @@ class HttpxSensor(Sensor):
         "technology",
     ]
 
-    def __init__(self, target: str):
+    def __init__(
+        self,
+        target: str,
+        *,
+        host_header: str | None = None,
+    ):
         self.target = target
-        self.adapter = HttpxAdapter(target)
+        self.host_header = host_header
+        self.adapter = HttpxAdapter(
+            target,
+            host_header=host_header,
+        )
 
     def collect(self):
         return self.adapter.execute()

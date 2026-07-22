@@ -26,6 +26,12 @@ from cli.commands.chronicle import show_chronicle
 from cli.commands.report import show_report
 from cli.commands.mission import new_mission, start_mission, mission_status, stop_mission
 from cli.commands.council import show_council
+from cli.commands.http_artifact import (
+    build_upload_url,
+    fetch_http_artifact,
+    fetch_uploaded_artifact,
+    print_http_artifact_result,
+)
 
 
 
@@ -74,6 +80,43 @@ def main():
     host_parser.add_argument(
         "target",
         help="Host or IP address",
+    )
+
+    download_parser = subparsers.add_parser(
+        "download",
+        help="Retrieve an HTTP artifact into mission evidence",
+    )
+
+    download_parser.add_argument(
+        "url",
+        help="URL to retrieve",
+    )
+
+    download_parser.add_argument(
+        "--host",
+        dest="host_header",
+        help="Optional Host header",
+    )
+
+    fetch_upload_parser = subparsers.add_parser(
+        "fetch-upload",
+        help="Retrieve a known file from /uploads into mission evidence",
+    )
+
+    fetch_upload_parser.add_argument(
+        "base_url",
+        help="Base URL or host that serves /uploads",
+    )
+
+    fetch_upload_parser.add_argument(
+        "filename",
+        help="Uploaded filename to retrieve",
+    )
+
+    fetch_upload_parser.add_argument(
+        "--host",
+        dest="host_header",
+        help="Optional Host header",
     )
 
     report_parser = subparsers.add_parser(
@@ -334,6 +377,24 @@ def main():
 
     elif args.command == "host":
         show_host(args.target)
+
+    elif args.command == "download":
+        result = fetch_http_artifact(
+            args.url,
+            host_header=args.host_header,
+        )
+        print_http_artifact_result(result)
+
+    elif args.command == "fetch-upload":
+        url = build_upload_url(args.base_url, args.filename)
+        print(f"Retrieving uploaded artifact from {url}...")
+        print()
+        result = fetch_uploaded_artifact(
+            args.base_url,
+            args.filename,
+            host_header=args.host_header,
+        )
+        print_http_artifact_result(result)
 
     elif args.command == "chronicle":
         show_chronicle(args.host)

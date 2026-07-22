@@ -13,7 +13,7 @@ authors = [
 ]
 
 dependencies = [
-    "rich>=13.0.0"
+    "rich>=13.0.0",
     "httpx>=0.28.0",
     "beautifulsoup4>=4.13.0",
 ]

@@ -16,21 +16,21 @@ class IdGenerator:
     REL-2026-0001
     """
 
-    PATHS = {
-        "MIS": Config.KNOWLEDGE_DIR / "missions",
-        "RUN": Config.KNOWLEDGE_DIR / "tool_runs",
-        "ENT": Config.KNOWLEDGE_DIR / "entities",
-        "OBS": Config.KNOWLEDGE_DIR / "observations",
-        "REL": Config.KNOWLEDGE_DIR / "relationships",
+    COLLECTIONS = {
+        "MIS": "missions",
+        "RUN": "tool_runs",
+        "ENT": "entities",
+        "OBS": "observations",
+        "REL": "relationships",
     }
 
     @classmethod
     def next(cls, prefix: str) -> str:
-        if prefix not in cls.PATHS:
+        if prefix not in cls.COLLECTIONS:
             raise ValueError(f"Unknown ID prefix: {prefix}")
 
         year = datetime.utcnow().year
-        root = cls.PATHS[prefix]
+        root = Config.KNOWLEDGE_DIR / cls.COLLECTIONS[prefix]
         root.mkdir(parents=True, exist_ok=True)
 
         existing = list(root.glob(f"{prefix}-{year}-*.md"))

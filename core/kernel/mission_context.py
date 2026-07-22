@@ -3,6 +3,9 @@ from core.repositories.tool_run_repository import ToolRunRepository
 from core.services.state_service import StateService
 from core.models.observation import Observation
 from core.repositories.observation_repository import ObservationRepository
+from core.models.mission import Mission
+from core.services.mission_service import MissionService
+
 
 class MissionContext:
     """
@@ -14,6 +17,7 @@ class MissionContext:
 
     def __init__(self):
         self.state = StateService()
+        self.missions = MissionService()
         self.tool_runs = ToolRunRepository()
         self.observations = ObservationRepository()
 
@@ -142,9 +146,12 @@ class MissionContext:
                     "url": data.get("url", "Unknown"),
                     "host": data.get("host", "Unknown"),
                     "host_ip": data.get("host_ip"),
+                    "host_header": data.get("host_header"),
+                    "probe_url": data.get("probe_url"),
                     "port": data.get("port"),
                     "scheme": data.get("scheme"),
                     "status_code": data.get("status_code"),
+                    "redirect_location": data.get("redirect_location"),
                     "title": data.get("title"),
                     "webserver": data.get("webserver"),
                     "content_type": data.get("content_type"),
@@ -162,3 +169,107 @@ class MissionContext:
             surfaces,
             key=lambda item: str(item["url"]),
         )
+
+    def web_vhosts(self) -> list[dict]:
+        """
+        Return virtual host intelligence for the active mission.
+        """
+        vhosts = []
+
+        for observation in self.mission_observations():
+            if observation.category != "web_vhost":
+                continue
+
+            data = observation.data or {}
+
+            vhosts.append(
+                {
+                    "hostname": data.get("hostname", "Unknown"),
+                    "url": data.get("url"),
+                    "base_url": data.get("base_url"),
+                    "status_code": data.get("status_code"),
+                    "content_length": data.get("content_length"),
+                    "redirect_location": data.get("redirect_location"),
+                    "observation_id": observation.id,
+                }
+            )
+
+        return sorted(
+            vhosts,
+            key=lambda item: str(item["hostname"]),
+        )
+
+    def current_mission(self) -> Mission:
+        """
+        Return the active Mission.
+        """
+        mission_id = self.require_mission_id()
+        return self.missions.open(mission_id)
+
+    def target(self) -> str:
+        """
+        Return the active mission scope as the operational target.
+        """
+        target = self.current_mission().scope.strip()
+
+        if not target:
+            raise RuntimeError(
+                "The active mission has no operational target."
+            )
+
+        return target
+    
+    def has_service(self, name: str) -> bool:
+        return any(
+            service["service"].lower() == name.lower()
+            for service in self.services()
+        )
+
+
+    def has_web_surface(self) -> bool:
+        return len(self.web_surfaces()) > 0
+
+
+    def has_vhosts(self) -> bool:
+        return len(self.web_vhosts()) > 0
+
+
+    def has_open_port(self, port: int) -> bool:
+        return any(
+            item["port"] == port
+            for item in self.open_ports()
+        )
+
+    # ----------------------------
+    # Planner Helper Methods
+    # ----------------------------
+
+    def has_service(self, name: str) -> bool:
+        """
+        True if the active mission contains the named service.
+        """
+        return any(
+            service["service"].lower() == name.lower()
+            for service in self.services()
+        )
+
+    def has_open_port(self, port: int) -> bool:
+        """
+        True if the specified port is open.
+        """
+        return any(
+            p["port"] == port
+            for p in self.open_ports()
+        )
+
+    def has_web_surface(self) -> bool:
+        """
+        True once HTTP reconnaissance has created endpoint observations.
+        """
+        return len(self.web_surfaces()) > 0
+
+    def has_vhosts(self) -> bool:
+        """
+        True once virtual host enumeration has been performed.
+        """
+        return len(self.web_vhosts()) > 0
