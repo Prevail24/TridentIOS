@@ -28,11 +28,18 @@ class PlannerRenderer:
 
             print(f"Reason: {recommendation.reason}")
 
+            if recommendation.inputs:
+                print("Known Inputs:")
+
+                for name, value in recommendation.inputs:
+                    print(f"  {name}: {value}")
+
             if recommendation.required_inputs:
                 required = ", ".join(
                     recommendation.required_inputs
                 )
                 print(f"Requires: {required}")
+                
             elif recommendation.executable:
                 print("Status: Ready")
             else:

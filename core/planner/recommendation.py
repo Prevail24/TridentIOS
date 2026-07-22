@@ -39,6 +39,11 @@ class Recommendation:
 
     available: bool = True
     rule: str | None = None
+    available: bool = True
+    rule: str | None = None
+
+    inputs: tuple[tuple[str, str], ...] = ()
+    required_inputs: tuple[str, ...] = ()
     required_inputs: tuple[str, ...] = ()
 
     @property

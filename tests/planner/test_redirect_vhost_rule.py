@@ -32,9 +32,11 @@ def test_recommends_vhost_discovery_for_redirect():
     )
     assert recommendation.confidence == "High"
     assert recommendation.rule == "RedirectVhostRule"
+    assert recommendation.inputs == (
+        ("target", "http://10.10.11.10"),
+        ("domain", "paper.htb"),
+    )
     assert recommendation.required_inputs == (
-        "target",
-        "domain",
         "wordlist",
     )
     assert recommendation.executable is False
@@ -69,3 +71,24 @@ def test_returns_none_when_vhosts_already_exist():
     recommendation = RedirectVhostRule().evaluate(context)
 
     assert recommendation is None
+
+def test_keeps_unknown_vhost_inputs_required():
+    context = FakeMissionContext(
+        surfaces=[
+            {
+                "url": None,
+                "redirect_location": "/login",
+            }
+        ]
+    )
+
+    recommendation = RedirectVhostRule().evaluate(context)
+
+    assert recommendation is not None
+    assert recommendation.inputs == ()
+    assert recommendation.required_inputs == (
+        "target",
+        "domain",
+        "wordlist",
+    )
+    assert recommendation.executable is False

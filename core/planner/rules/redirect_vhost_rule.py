@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from core.planner.recommendation import Recommendation
 from core.planner.rule import PlannerRule
 
@@ -21,19 +23,44 @@ class RedirectVhostRule(PlannerRule):
             if not redirect_location:
                 continue
 
+            # Prefer the original probe target when HTTPX used a Host
+            # header. Otherwise, use the observed endpoint URL.
+            target = (
+                surface.get("probe_url")
+                or surface.get("url")
+            )
+
+            domain = urlparse(
+                redirect_location
+            ).hostname
+
+            inputs = []
+            required_inputs = []
+
+            if target:
+                inputs.append(("target", target))
+            else:
+                required_inputs.append("target")
+
+            if domain:
+                inputs.append(("domain", domain))
+            else:
+                required_inputs.append("domain")
+
+            # The Planner cannot safely choose an operator's wordlist.
+            required_inputs.append("wordlist")
+
             return Recommendation(
                 capability_id="web.recon.virtual-host-discovery",
                 reason=(
-                    f"HTTP endpoint {surface.get('url', 'Unknown')} redirects "
-                    f"to {redirect_location}, which may indicate a canonical "
-                    "hostname or additional virtual-host routing."
+                    f"HTTP endpoint {target or 'Unknown'} redirects "
+                    f"to {redirect_location}, which may indicate a "
+                    "canonical hostname or additional virtual-host "
+                    "routing."
                 ),
                 confidence="High",
-                required_inputs=(
-                    "target",
-                    "domain",
-                    "wordlist",
-                ),
+                inputs=tuple(inputs),
+                required_inputs=tuple(required_inputs),
                 rule=self.__class__.__name__,
             )
 
