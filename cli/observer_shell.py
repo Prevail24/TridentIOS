@@ -1,5 +1,5 @@
 import shlex
-
+from dataclasses import replace
 from cli.commands.http_artifact import (
     build_upload_url,
     fetch_http_artifact,
@@ -18,8 +18,8 @@ from core.command.capability_router import (
 )
 from core.species.web.web_species import WebSpecies
 from core.species.web.serpents import ReconSerpent
-import shlex
-from dataclasses import replace
+
+
 
 
 
@@ -871,7 +871,6 @@ class ObserverShell:
             recommendations = self.planner.plan(
                 self.mission_context
             )
-            
         except RuntimeError as exc:
             print()
             print(str(exc))
@@ -957,46 +956,70 @@ class ObserverShell:
             print()
             return
 
-        if (
-            resolved_recommendation.capability_id
-            == "web.recon.virtual-host-discovery"
-        ):
-            inputs = dict(resolved_recommendation.inputs)
+        history = self.planner.history
+        capability_id = resolved_recommendation.capability_id
+        scope = resolved_recommendation.scope
 
-            serpent = ReconSerpent(
-                vhost_target=inputs.get("target"),
-                vhost_domain=inputs.get("domain"),
-                vhost_wordlist=inputs.get("wordlist"),
-            )
-
-            router = CapabilityRouter([serpent])
-
-        else:
-            router = CapabilityRouter(
-                WebSpecies().serpents()
-            )
-
-        print()
-        print("Medusa")
-        print(
-            f"Dispatching "
-            f"{resolved_recommendation.capability_id}..."
+        history.mark_accepted(
+            capability_id,
+            scope,
         )
-        print()
 
         try:
+            if (
+                capability_id
+                == "web.recon.virtual-host-discovery"
+            ):
+                inputs = dict(
+                    resolved_recommendation.inputs
+                )
+
+                serpent = ReconSerpent(
+                    vhost_target=inputs.get("target"),
+                    vhost_domain=inputs.get("domain"),
+                    vhost_wordlist=inputs.get("wordlist"),
+                )
+
+                router = CapabilityRouter([serpent])
+
+            else:
+                router = CapabilityRouter(
+                    WebSpecies().serpents()
+                )
+
+            history.mark_running(
+                capability_id,
+                scope,
+            )
+
+            print()
+            print("Medusa")
+            print(f"Dispatching {capability_id}...")
+            print()
+
             router.execute_recommendation(
                 resolved_recommendation,
                 self.mission_context,
             )
+
         except (
             CapabilityExecutionError,
             CapabilityNotFoundError,
             RuntimeError,
         ) as exc:
+            history.mark_failed(
+                capability_id,
+                scope,
+            )
+
             print(f"Execution failed: {exc}")
             print()
             return
+
+        history.mark_completed(
+            capability_id,
+            scope,
+        )
 
         print("Capability execution completed.")
         print()

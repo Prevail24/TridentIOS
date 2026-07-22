@@ -1,11 +1,18 @@
 import pytest
 
 from cli.observer_shell import ObserverShell
-from core.planner.recommendation import Recommendation
+from core.planner.history import PlannerHistory
+from core.planner.recommendation import (
+    Recommendation,
+    RecommendationStatus,
+)
 
 
 def install_fake_planner(monkeypatch, recommendations):
     class FakePlanner:
+        def __init__(self):
+            self.history = PlannerHistory()
+
         def plan(self, context):
             return recommendations
 
@@ -14,6 +21,25 @@ def install_fake_planner(monkeypatch, recommendations):
         FakePlanner,
     )
 
+
+class RecordingHistory(PlannerHistory):
+    def __init__(self):
+        super().__init__()
+        self.transitions = []
+
+    def mark_status(
+        self,
+        capability_id,
+        scope,
+        status,
+    ):
+        self.transitions.append(status)
+
+        super().mark_status(
+            capability_id,
+            scope,
+            status,
+        )
 
 def test_plan_execute_rejects_invalid_selection(
     monkeypatch,
@@ -24,6 +50,24 @@ def test_plan_execute_rejects_invalid_selection(
         reason="HTTP reconnaissance is required.",
     )
     install_fake_planner(monkeypatch, [recommendation])
+    class RecordingHistory(PlannerHistory):
+        def __init__(self):
+            super().__init__()
+            self.transitions = []
+
+        def mark_status(
+            self,
+            capability_id,
+            scope,
+            status,
+        ):
+            self.transitions.append(status)
+
+            super().mark_status(
+                capability_id,
+                scope,
+                status,
+            )
 
     shell = ObserverShell({})
     shell.execute_plan_recommendation("plan execute 2")
@@ -87,12 +131,20 @@ def test_plan_execute_can_be_cancelled(
     )
 
     shell = ObserverShell({})
-    shell.execute_plan_recommendation("plan execute 1")
+
+    shell.execute_plan_recommendation(
+        "plan execute 1"
+    )
+
+    status = shell.planner.history.status_for(
+        recommendation.capability_id,
+        recommendation.scope,
+    )
 
     output = capsys.readouterr().out
 
+    assert status is None
     assert "Execution cancelled" in output
-
 
 def test_plan_execute_dispatches_confirmed_recommendation(
     monkeypatch,
@@ -148,6 +200,7 @@ def test_plan_execute_dispatches_confirmed_recommendation(
         lambda: calls.append(("replan",)),
     )
 
+    shell.planner.history = RecordingHistory()
     shell.execute_plan_recommendation("plan execute 1")
 
     output = capsys.readouterr().out
@@ -163,6 +216,19 @@ def test_plan_execute_dispatches_confirmed_recommendation(
 
     assert "Dispatching" in output
     assert "Capability execution completed" in output
+    assert shell.planner.history.transitions == [
+        RecommendationStatus.ACCEPTED,
+        RecommendationStatus.RUNNING,
+        RecommendationStatus.COMPLETED,
+    ]
+
+    assert (
+        shell.planner.history.status_for(
+            recommendation.capability_id,
+            recommendation.scope,
+        )
+        is RecommendationStatus.COMPLETED
+    )
 
 def test_plan_execute_rejects_unknown_option(
     monkeypatch,
@@ -288,4 +354,68 @@ def test_plan_execute_configures_vhost_from_resolved_inputs(
 
     assert "Capability execution completed" in output
 
+def test_plan_execute_marks_failed_when_dispatch_fails(
+    monkeypatch,
+    capsys,
+):
+    recommendation = Recommendation(
+        capability_id="web.recon.technology-discovery",
+        reason="HTTP reconnaissance is required.",
+    )
+    install_fake_planner(monkeypatch, [recommendation])
 
+    class FakeWebSpecies:
+        def serpents(self):
+            return ["recon-serpent"]
+
+    class FailingCapabilityRouter:
+        def __init__(self, serpents):
+            pass
+
+        def execute_recommendation(
+            self,
+            selected_recommendation,
+            context,
+        ):
+            raise RuntimeError("serpent execution failed")
+
+    monkeypatch.setattr(
+        "cli.observer_shell.WebSpecies",
+        FakeWebSpecies,
+    )
+    monkeypatch.setattr(
+        "cli.observer_shell.CapabilityRouter",
+        FailingCapabilityRouter,
+    )
+    monkeypatch.setattr(
+        "builtins.input",
+        lambda prompt: "y",
+    )
+
+    shell = ObserverShell({})
+    shell.planner.history = RecordingHistory()
+
+    shell.execute_plan_recommendation(
+        "plan execute 1"
+    )
+
+    output = capsys.readouterr().out
+
+    assert shell.planner.history.transitions == [
+        RecommendationStatus.ACCEPTED,
+        RecommendationStatus.RUNNING,
+        RecommendationStatus.FAILED,
+    ]
+
+    assert (
+        shell.planner.history.status_for(
+            recommendation.capability_id,
+            recommendation.scope,
+        )
+        is RecommendationStatus.FAILED
+    )
+
+    assert (
+        "Execution failed: serpent execution failed"
+        in output
+    )
