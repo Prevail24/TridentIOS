@@ -10,7 +10,9 @@ from core.planner.recommendation import (
 
 def install_fake_planner(monkeypatch, recommendations):
     class FakePlanner:
-        def __init__(self):
+        def __init__(self, history=None):
+            # Keep execution tests isolated from durable mission history,
+            # while matching the real Planner constructor.
             self.history = PlannerHistory()
 
         def plan(self, context):

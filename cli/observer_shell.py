@@ -10,6 +10,7 @@ from cli.observer_dashboard import ObserverDashboard
 from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
 from core.planner.planner import Planner
+from core.planner.history import PlannerHistory
 from core.renderers.planner_renderer import PlannerRenderer
 from core.command.capability_router import (
     CapabilityExecutionError,
@@ -35,7 +36,18 @@ class ObserverShell:
         self.context = context or {}
         self.mission_context = MissionContext()
         self.dashboard = ObserverDashboard()
-        self.planner = Planner()
+        
+        mission_id = self.mission_context.current_mission_id()
+
+        planner_history = (
+            PlannerHistory(mission_id=mission_id)
+            if mission_id is not None
+            else PlannerHistory()
+        )
+
+        self.planner = Planner(
+            history=planner_history,
+        )
 
     def run(self):
         self.dashboard.render(self.context)
