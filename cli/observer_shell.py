@@ -17,6 +17,9 @@ from core.command.capability_router import (
     CapabilityRouter,
 )
 from core.species.web.web_species import WebSpecies
+from core.species.web.serpents import ReconSerpent
+from dataclasses import replace
+
 
 
 class ObserverShell:
@@ -118,9 +121,8 @@ class ObserverShell:
         print("status    Show the Observatory dashboard")
         print("all       Show the complete mission intelligence view")
         print("plan      Show the current mission plan")
-        print("plan execute <number>")
-        print("          Execute a ready recommendation after confirmation")
-
+        print("plan execute <number> [--wordlist <path>]")
+        print("          Supply missing inputs and execute after confirmation")
         print("ports     Show open ports for the active mission")
         print("services  Show discovered network services")
         print("web       Show discovered HTTP surfaces")
@@ -802,11 +804,12 @@ class ObserverShell:
         raw_command: str,
     ):
         """
-        Execute a numbered Planner recommendation after explicit
-        operator confirmation.
+        Resolve operator-supplied inputs and execute a numbered Planner
+        recommendation after explicit confirmation.
 
         Usage:
             plan execute <number>
+            plan execute <number> --wordlist <path>
         """
         try:
             parts = shlex.split(raw_command)
@@ -816,9 +819,12 @@ class ObserverShell:
             print()
             return
 
-        if len(parts) != 3:
+        if len(parts) < 3:
             print()
-            print("Usage: plan execute <number>")
+            print(
+                "Usage: plan execute <number> "
+                "[--wordlist <path>]"
+            )
             print()
             return
 
@@ -833,6 +839,28 @@ class ObserverShell:
         if selection < 1:
             print()
             print("Recommendation number must be 1 or greater.")
+            print()
+            return
+
+        try:
+            positionals, options = self._parse_options(
+                parts[3:],
+                value_options={
+                    "--wordlist",
+                },
+            )
+        except ValueError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        if positionals:
+            print()
+            print(
+                "Usage: plan execute <number> "
+                "[--wordlist <path>]"
+            )
             print()
             return
 
@@ -864,22 +892,50 @@ class ObserverShell:
 
         recommendation = recommendations[selection - 1]
 
+        # Begin with inputs already resolved by the Planner.
+        resolved_inputs = dict(recommendation.inputs)
+
+        # Add values explicitly supplied by the Observer.
+        wordlist = options.get("--wordlist")
+
+        if wordlist:
+            resolved_inputs["wordlist"] = wordlist
+
+        # An input is no longer required once it has a usable value.
+        remaining_required_inputs = tuple(
+            name
+            for name in recommendation.required_inputs
+            if not resolved_inputs.get(name)
+        )
+
+        resolved_recommendation = replace(
+            recommendation,
+            inputs=tuple(resolved_inputs.items()),
+            required_inputs=remaining_required_inputs,
+        )
+
         print()
         print("Selected Recommendation")
         print("-----------------------")
-        print(recommendation.capability_id)
-        print(f"Reason: {recommendation.reason}")
+        print(resolved_recommendation.capability_id)
+        print(f"Reason: {resolved_recommendation.reason}")
 
-        if not recommendation.executable:
+        if resolved_recommendation.inputs:
+            print("Inputs:")
+
+            for name, value in resolved_recommendation.inputs:
+                print(f"  {name}: {value}")
+
+        if not resolved_recommendation.executable:
             print()
             print("This recommendation is not ready to execute.")
 
-            if not recommendation.available:
+            if not resolved_recommendation.available:
                 print("The capability is currently unavailable.")
 
-            if recommendation.required_inputs:
+            if resolved_recommendation.required_inputs:
                 required = ", ".join(
-                    recommendation.required_inputs
+                    resolved_recommendation.required_inputs
                 )
                 print(f"Missing input: {required}")
 
@@ -897,20 +953,36 @@ class ObserverShell:
             print()
             return
 
-        router = CapabilityRouter(
-            WebSpecies().serpents()
-        )
+        if (
+            resolved_recommendation.capability_id
+            == "web.recon.virtual-host-discovery"
+        ):
+            inputs = dict(resolved_recommendation.inputs)
+
+            serpent = ReconSerpent(
+                vhost_target=inputs.get("target"),
+                vhost_domain=inputs.get("domain"),
+                vhost_wordlist=inputs.get("wordlist"),
+            )
+
+            router = CapabilityRouter([serpent])
+
+        else:
+            router = CapabilityRouter(
+                WebSpecies().serpents()
+            )
 
         print()
         print("Medusa")
         print(
-            f"Dispatching {recommendation.capability_id}..."
+            f"Dispatching "
+            f"{resolved_recommendation.capability_id}..."
         )
         print()
 
         try:
             router.execute_recommendation(
-                recommendation,
+                resolved_recommendation,
                 self.mission_context,
             )
         except (
