@@ -11,6 +11,12 @@ from core.kernel.mission_context import MissionContext
 from core.services.gobuster_service import GobusterService
 from core.planner.planner import Planner
 from core.renderers.planner_renderer import PlannerRenderer
+from core.command.capability_router import (
+    CapabilityExecutionError,
+    CapabilityNotFoundError,
+    CapabilityRouter,
+)
+from core.species.web.web_species import WebSpecies
 
 
 class ObserverShell:
@@ -76,7 +82,7 @@ class ObserverShell:
 
             elif command.startswith("fetch-upload"):
                 self.run_fetch_upload(raw_command)
-            
+
             elif command == "observations":
                 self.show_observations()
 
@@ -85,9 +91,12 @@ class ObserverShell:
 
             elif command == "services":
                 self.show_services()
-            
+
             elif command == "web":
                 self.show_web()
+
+            elif command.startswith("plan execute"):
+                self.execute_plan_recommendation(raw_command)
 
             elif command == "plan":
                 self.show_plan()
@@ -105,10 +114,12 @@ class ObserverShell:
         print()
         print("Available Commands")
         print("------------------")
-        
+
         print("status    Show the Observatory dashboard")
         print("all       Show the complete mission intelligence view")
         print("plan      Show the current mission plan")
+        print("plan execute <number>")
+        print("          Execute a ready recommendation after confirmation")
 
         print("ports     Show open ports for the active mission")
         print("services  Show discovered network services")
@@ -129,7 +140,7 @@ class ObserverShell:
 
         print("runs      Show tool runs for the active mission")
         print("hunter    Show Hunter's assessment")
-        
+
         print("clear     Redraw the Observatory")
         print("help      Show available commands")
         print("exit      Dismiss the Council")
@@ -484,7 +495,7 @@ class ObserverShell:
                     technologies = ", ".join(surface["technologies"])
                     print(f"  Technologies : {technologies}")
 
-                print()   
+                print()
 
     def show_vhosts(self):
             print()
@@ -546,7 +557,7 @@ class ObserverShell:
         self.show_web()
         self.show_vhosts()
         self.show_hunter()
-        self.show_runs() 
+        self.show_runs()
 
 
     def run_gobuster(self, raw_command: str):
@@ -784,7 +795,138 @@ class ObserverShell:
             print()
             return
 
-        PlannerRenderer().render(recommendations)    
+        PlannerRenderer().render(recommendations)
+
+    def execute_plan_recommendation(
+        self,
+        raw_command: str,
+    ):
+        """
+        Execute a numbered Planner recommendation after explicit
+        operator confirmation.
+
+        Usage:
+            plan execute <number>
+        """
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            print()
+            print(f"Could not parse command: {exc}")
+            print()
+            return
+
+        if len(parts) != 3:
+            print()
+            print("Usage: plan execute <number>")
+            print()
+            return
+
+        try:
+            selection = int(parts[2])
+        except ValueError:
+            print()
+            print("Recommendation number must be an integer.")
+            print()
+            return
+
+        if selection < 1:
+            print()
+            print("Recommendation number must be 1 or greater.")
+            print()
+            return
+
+        try:
+            recommendations = Planner().plan(
+                self.mission_context
+            )
+        except RuntimeError as exc:
+            print()
+            print(str(exc))
+            print()
+            return
+
+        if not recommendations:
+            print()
+            print("No recommendations are currently available.")
+            print()
+            return
+
+        if selection > len(recommendations):
+            print()
+            print(
+                f"Recommendation {selection} does not exist. "
+                f"Choose a number from 1 to "
+                f"{len(recommendations)}."
+            )
+            print()
+            return
+
+        recommendation = recommendations[selection - 1]
+
+        print()
+        print("Selected Recommendation")
+        print("-----------------------")
+        print(recommendation.capability_id)
+        print(f"Reason: {recommendation.reason}")
+
+        if not recommendation.executable:
+            print()
+            print("This recommendation is not ready to execute.")
+
+            if not recommendation.available:
+                print("The capability is currently unavailable.")
+
+            if recommendation.required_inputs:
+                required = ", ".join(
+                    recommendation.required_inputs
+                )
+                print(f"Missing input: {required}")
+
+            print()
+            return
+
+        print()
+        confirmation = input(
+            "Execute this recommendation? [y/N]: "
+        ).strip().lower()
+
+        if confirmation not in {"y", "yes"}:
+            print()
+            print("Execution cancelled.")
+            print()
+            return
+
+        router = CapabilityRouter(
+            WebSpecies().serpents()
+        )
+
+        print()
+        print("Medusa")
+        print(
+            f"Dispatching {recommendation.capability_id}..."
+        )
+        print()
+
+        try:
+            router.execute_recommendation(
+                recommendation,
+                self.mission_context,
+            )
+        except (
+            CapabilityExecutionError,
+            CapabilityNotFoundError,
+            RuntimeError,
+        ) as exc:
+            print(f"Execution failed: {exc}")
+            print()
+            return
+
+        print("Capability execution completed.")
+        print()
+        print("Updated mission plan:")
+
+        self.show_plan()
 
     def _parse_options(
         self,

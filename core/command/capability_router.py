@@ -59,10 +59,10 @@ class CapabilityRouter:
         return results
 
     def execute_recommendation(
-        self,
-        recommendation: Recommendation,
-        context,
-    ) -> list:
+    self,
+    recommendation: Recommendation,
+    context,
+) -> list:
         """
         Execute a Planner recommendation when it is immediately
         executable.
@@ -79,6 +79,14 @@ class CapabilityRouter:
             raise CapabilityExecutionError(
                 f"Capability '{recommendation.capability_id}' requires "
                 f"additional input: {required}"
+            )
+
+        if not recommendation.executable:
+            raise CapabilityExecutionError(
+                f"Recommendation for "
+                f"'{recommendation.capability_id}' is not executable "
+                f"while its status is "
+                f"'{recommendation.status.value}'."
             )
 
         return self.execute(
