@@ -236,3 +236,96 @@ def test_entries_filters_by_scope():
     )
     assert entries[0].scope == "paper.htb"
     assert entries[0].status is RecommendationStatus.INTERRUPTED
+
+
+def test_event_ledger_records_lifecycle_transitions():
+    history = PlannerHistory()
+
+    history.mark_accepted(CAPABILITY_ID, SCOPE)
+    history.mark_running(CAPABILITY_ID, SCOPE)
+    history.mark_completed(CAPABILITY_ID, SCOPE)
+
+    events = history.events()
+
+    assert isinstance(events, tuple)
+    assert len(events) == 3
+
+    assert events[0].previous_status is None
+    assert (
+        events[0].new_status
+        is RecommendationStatus.ACCEPTED
+    )
+
+    assert (
+        events[1].previous_status
+        is RecommendationStatus.ACCEPTED
+    )
+    assert (
+        events[1].new_status
+        is RecommendationStatus.RUNNING
+    )
+
+    assert (
+        events[2].previous_status
+        is RecommendationStatus.RUNNING
+    )
+    assert (
+        events[2].new_status
+        is RecommendationStatus.COMPLETED
+    )
+
+    assert all(
+        event.occurred_at.tzinfo is not None
+        for event in events
+    )
+
+    assert len(
+        {event.event_id for event in events}
+    ) == 3
+
+
+def test_repeating_current_status_does_not_duplicate_event():
+    history = PlannerHistory()
+
+    history.mark_accepted(CAPABILITY_ID, SCOPE)
+    history.mark_accepted(CAPABILITY_ID, SCOPE)
+
+    assert len(history.events()) == 1
+
+
+def test_recovery_appends_interrupted_events():
+    history = PlannerHistory()
+
+    history.mark_accepted(
+        "capability.one",
+        "10.10.11.10",
+    )
+
+    history.mark_running(
+        "capability.two",
+        "paper.htb",
+    )
+
+    original_event_count = len(history.events())
+
+    assert history.recover_interrupted() == 2
+
+    recovery_events = history.events()[
+        original_event_count:
+    ]
+
+    assert len(recovery_events) == 2
+
+    assert {
+        event.previous_status
+        for event in recovery_events
+    } == {
+        RecommendationStatus.ACCEPTED,
+        RecommendationStatus.RUNNING,
+    }
+
+    assert all(
+        event.new_status
+        is RecommendationStatus.INTERRUPTED
+        for event in recovery_events
+    )

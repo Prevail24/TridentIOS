@@ -27,24 +27,30 @@ class PlannerHistoryRepository:
             raise ValueError("Mission ID cannot be empty.")
 
         if Path(mission_id).name != mission_id:
-            raise ValueError("Mission ID cannot contain path separators.")
+            raise ValueError(
+                "Mission ID cannot contain path separators."
+            )
 
         return self.root / f"{mission_id}.json"
 
-    def load(self, mission_id: str) -> list[dict]:
-        """
-        Return persisted recommendation records for a mission.
-
-        A mission without existing history begins with an empty list.
-        """
+    def _load_payload(self, mission_id: str) -> dict:
         filepath = self._path_for(mission_id)
 
         if not filepath.exists():
-            return []
+            return {
+                "mission_id": mission_id,
+                "recommendations": [],
+                "events": [],
+            }
 
         payload = json.loads(
             filepath.read_text(encoding="utf-8")
         )
+
+        if not isinstance(payload, dict):
+            raise ValueError(
+                "Planner history payload must be an object."
+            )
 
         stored_mission_id = payload.get("mission_id")
 
@@ -53,29 +59,84 @@ class PlannerHistoryRepository:
                 "Planner history mission ID does not match its file."
             )
 
-        recommendations = payload.get("recommendations", [])
+        recommendations = payload.get(
+            "recommendations",
+            [],
+        )
 
         if not isinstance(recommendations, list):
             raise ValueError(
                 "Planner history recommendations must be a list."
             )
 
-        return recommendations
+        # Older Planner history files predate the event ledger.
+        events = payload.get("events", [])
+
+        if not isinstance(events, list):
+            raise ValueError(
+                "Planner history events must be a list."
+            )
+
+        return {
+            "mission_id": mission_id,
+            "recommendations": recommendations,
+            "events": events,
+        }
+
+    def load(self, mission_id: str) -> list[dict]:
+        """
+        Return the latest recommendation states for a mission.
+        """
+        return self._load_payload(
+            mission_id
+        )["recommendations"]
+
+    def load_events(self, mission_id: str) -> list[dict]:
+        """
+        Return the immutable lifecycle event ledger for a mission.
+
+        Legacy history files without an events field return an empty
+        ledger.
+        """
+        return self._load_payload(
+            mission_id
+        )["events"]
 
     def save(
         self,
         mission_id: str,
         recommendations: list[dict],
+        *,
+        events: list[dict] | None = None,
     ) -> Path:
         """
-        Atomically replace the persisted history for a mission.
+        Atomically replace the complete persisted Planner history.
         """
+        if not isinstance(recommendations, list):
+            raise ValueError(
+                "Planner history recommendations must be a list."
+            )
+
+        if events is None:
+            # Preserve an existing ledger for callers using the
+            # pre-ledger save signature.
+            events = self.load_events(mission_id)
+
+        if not isinstance(events, list):
+            raise ValueError(
+                "Planner history events must be a list."
+            )
+
         filepath = self._path_for(mission_id)
-        filepath.parent.mkdir(parents=True, exist_ok=True)
+        filepath.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
 
         payload = {
             "mission_id": mission_id,
             "recommendations": recommendations,
+            "events": events,
         }
 
         temporary_path = filepath.with_suffix(".tmp")

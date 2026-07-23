@@ -191,3 +191,40 @@ def test_recovery_is_noop_without_unfinished_work(tmp_path):
     )
 
     assert history.recover_interrupted() == 0
+
+
+def test_persistent_event_ledger_survives_recreation(
+    tmp_path,
+):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    first_session = PlannerHistory(
+        mission_id="MIS-2026-0001",
+        repository=repository,
+    )
+
+    first_session.mark_accepted(
+        CAPABILITY_ID,
+        SCOPE,
+    )
+
+    first_session.mark_running(
+        CAPABILITY_ID,
+        SCOPE,
+    )
+
+    expected_events = first_session.events()
+
+    second_session = PlannerHistory(
+        mission_id="MIS-2026-0001",
+        repository=repository,
+    )
+
+    assert second_session.events() == expected_events
+
+    assert all(
+        event.mission_id == "MIS-2026-0001"
+        for event in second_session.events()
+    )

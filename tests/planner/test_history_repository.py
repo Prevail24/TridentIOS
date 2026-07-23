@@ -126,3 +126,143 @@ def test_rejects_path_traversal_mission_id(tmp_path):
         match="path separators",
     ):
         repository.load("../outside")
+
+
+
+def test_round_trips_event_ledger(tmp_path):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    recommendations = [
+        {
+            "capability_id": "web.recon.technology-discovery",
+            "scope": "10.10.11.10",
+            "status": "completed",
+        }
+    ]
+
+    events = [
+        {
+            "event_id": "EVENT-0001",
+            "occurred_at": "2026-07-24T12:00:00+00:00",
+            "mission_id": "MIS-2026-0001",
+            "capability_id": "web.recon.technology-discovery",
+            "scope": "10.10.11.10",
+            "previous_status": None,
+            "new_status": "accepted",
+        },
+        {
+            "event_id": "EVENT-0002",
+            "occurred_at": "2026-07-24T12:01:00+00:00",
+            "mission_id": "MIS-2026-0001",
+            "capability_id": "web.recon.technology-discovery",
+            "scope": "10.10.11.10",
+            "previous_status": "accepted",
+            "new_status": "completed",
+        },
+    ]
+
+    filepath = repository.save(
+        "MIS-2026-0001",
+        recommendations,
+        events=events,
+    )
+
+    assert repository.load(
+        "MIS-2026-0001"
+    ) == recommendations
+
+    assert repository.load_events(
+        "MIS-2026-0001"
+    ) == events
+
+    payload = json.loads(
+        filepath.read_text(encoding="utf-8")
+    )
+
+    assert payload["events"] == events
+
+
+def test_legacy_history_without_events_loads_empty_ledger(
+    tmp_path,
+):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    repository.root.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    filepath = (
+        repository.root
+        / "MIS-2026-0001.json"
+    )
+
+    filepath.write_text(
+        json.dumps(
+            {
+                "mission_id": "MIS-2026-0001",
+                "recommendations": [
+                    {
+                        "capability_id": (
+                            "web.recon.technology-discovery"
+                        ),
+                        "scope": "10.10.11.10",
+                        "status": "completed",
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert repository.load_events(
+        "MIS-2026-0001"
+    ) == []
+
+
+
+def test_save_without_events_preserves_existing_ledger(
+    tmp_path,
+):
+    repository = PlannerHistoryRepository(
+        root=tmp_path / "planner_history"
+    )
+
+    events = [
+        {
+            "event_id": "EVENT-0001",
+            "occurred_at": "2026-07-24T12:00:00+00:00",
+            "mission_id": "MIS-2026-0001",
+            "capability_id": "capability.one",
+            "scope": "paper.htb",
+            "previous_status": None,
+            "new_status": "accepted",
+        }
+    ]
+
+    repository.save(
+        "MIS-2026-0001",
+        [],
+        events=events,
+    )
+
+    repository.save(
+        "MIS-2026-0001",
+        [
+            {
+                "capability_id": "capability.one",
+                "scope": "paper.htb",
+                "status": "completed",
+            }
+        ],
+    )
+
+    assert repository.load_events(
+        "MIS-2026-0001"
+    ) == events
