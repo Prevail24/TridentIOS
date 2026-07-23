@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from core.models.tool_run import ToolRun
 from core.repositories.tool_run_repository import ToolRunRepository
@@ -29,8 +29,8 @@ class ToolRunService:
             target=target,
             mission_id=mission_id,
             operator=operator,
-            started=datetime.utcnow(),
-            finished=datetime.utcnow(),
+            started=datetime.now(UTC),
+            finished=datetime.now(UTC),
             status="completed",
         )
 
@@ -45,7 +45,7 @@ class ToolRunService:
         return self.repository.list()
 
     def _generate_id(self) -> str:
-        year = datetime.utcnow().year
+        year = datetime.now(UTC).year
         number = len(self.repository.list()) + 1
 
         return f"RUN-{year}-{number:04d}"

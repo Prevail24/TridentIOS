@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from core.config import Config
@@ -29,7 +29,7 @@ class IdGenerator:
         if prefix not in cls.COLLECTIONS:
             raise ValueError(f"Unknown ID prefix: {prefix}")
 
-        year = datetime.utcnow().year
+        year = datetime.now(UTC).year
         root = Config.KNOWLEDGE_DIR / cls.COLLECTIONS[prefix]
         root.mkdir(parents=True, exist_ok=True)
 

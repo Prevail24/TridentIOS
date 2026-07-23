@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -27,7 +27,7 @@ class CaseManager:
             "target": target,
             "run_id": run_id,
             "status": "ACTIVE",
-            "created": datetime.utcnow().isoformat()
+            "created": datetime.now(UTC).isoformat()
         }
 
         with open(case_dir / "mission.json", "w") as f:

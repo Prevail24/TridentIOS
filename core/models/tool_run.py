@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 
 
 @dataclass
@@ -20,8 +20,8 @@ class ToolRun:
 
     status: str = "completed"
 
-    started: datetime = field(default_factory=datetime.utcnow)
-    finished: datetime = field(default_factory=datetime.utcnow)
+    started: datetime = field(default_factory=lambda: datetime.now(UTC))
+    finished: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     evidence: list[str] = field(default_factory=list)
     observations: list[str] = field(default_factory=list)
